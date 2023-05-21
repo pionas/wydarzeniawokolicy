@@ -1,4 +1,4 @@
-package pl.wydarzeniawokolicy.app
+package pl.wydarzeniawokolicy
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
