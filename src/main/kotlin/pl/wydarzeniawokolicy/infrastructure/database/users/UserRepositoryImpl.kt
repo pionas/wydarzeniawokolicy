@@ -2,7 +2,6 @@ package pl.wydarzeniawokolicy.infrastructure.database.users
 
 import org.springframework.stereotype.Repository
 import pl.wydarzeniawokolicy.domain.users.UserRepository
-import pl.wydarzeniawokolicy.domain.users.api.User
 import java.time.LocalDateTime
 import java.util.*
 
