@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long,
+    var id: Long?,
     var name: String,
     var email: String,
     var password: String,

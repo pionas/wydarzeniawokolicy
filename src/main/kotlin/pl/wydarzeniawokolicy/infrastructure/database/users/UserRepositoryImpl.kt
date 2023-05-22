@@ -2,6 +2,7 @@ package pl.wydarzeniawokolicy.infrastructure.database.users
 
 import org.springframework.stereotype.Repository
 import pl.wydarzeniawokolicy.domain.users.UserRepository
+import pl.wydarzeniawokolicy.domain.users.api.User
 import java.time.LocalDateTime
 import java.util.*
 
@@ -24,5 +25,13 @@ class UserRepositoryImpl(val userJpaRepository: UserJpaRepository) : UserReposit
 
     override fun deleteById(userId: Long) {
         userJpaRepository.deleteById(userId)
+    }
+
+    override fun existsByName(name: String): Boolean {
+        return userJpaRepository.existsByName(name)
+    }
+
+    override fun existsByEmail(email: String): Boolean {
+        return userJpaRepository.existsByEmail(email)
     }
 }

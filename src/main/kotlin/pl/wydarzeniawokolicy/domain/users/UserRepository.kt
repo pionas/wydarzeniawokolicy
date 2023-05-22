@@ -1,5 +1,6 @@
 package pl.wydarzeniawokolicy.domain.users
 
+import pl.wydarzeniawokolicy.domain.users.api.User
 import java.util.*
 
 interface UserRepository {

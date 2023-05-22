@@ -5,7 +5,7 @@ import pl.wydarzeniawokolicy.domain.users.api.User
 import pl.wydarzeniawokolicy.domain.users.api.UserDetails
 import pl.wydarzeniawokolicy.domain.users.api.UserSignUp
 
-@Mapper
+@Mapper(componentModel = "spring")
 interface UserMapper {
 
     fun mapToDto(user: User): UserDto
