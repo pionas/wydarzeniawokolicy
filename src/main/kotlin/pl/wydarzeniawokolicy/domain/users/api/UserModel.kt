@@ -1,6 +1,9 @@
 package pl.wydarzeniawokolicy.domain.users.api
 
+import lombok.EqualsAndHashCode
+import org.springframework.security.crypto.password.PasswordEncoder
 import pl.wydarzeniawokolicy.domain.shared.BasicModel
+import pl.wydarzeniawokolicy.domain.shared.StringUtils
 import pl.wydarzeniawokolicy.infrastructure.database.users.UserEntity
 import java.time.LocalDateTime
 
@@ -8,8 +11,8 @@ class UserDetails(
     val name: String,
     val email: String,
     val oldPassword: String,
-    val password: String,
-    val passwordConfirm: String
+    val password: String?,
+    val passwordConfirm: String?
 ) {
     fun validPassword(): Boolean = password == passwordConfirm
 }
@@ -18,6 +21,7 @@ class UserSignUp(val name: String, val email: String, val password: String, val 
     fun validPassword(): Boolean = password == passwordConfirm
 }
 
+@EqualsAndHashCode
 class User(
     val id: Long?, var name: String, var email: String, var password: String?, var salt: String?,
     createdAt: LocalDateTime,
@@ -25,10 +29,19 @@ class User(
     deletedAt: LocalDateTime?
 ) : BasicModel(createdAt, updatedAt, deletedAt) {
 
-    fun update(user: User): User {
+    fun update(
+        user: UserDetails,
+        stringUtils: StringUtils,
+        passwordEncoder: PasswordEncoder,
+        localDateTimeNow: LocalDateTime
+    ) {
         this.name = user.name
         this.email = user.email
-        return this
+        this.updatedAt = localDateTimeNow
+        user.password?.let {
+            this.salt = stringUtils.randomAlphanumeric(10)
+            this.password = passwordEncoder.encode(it.plus(this.salt))
+        }
     }
 
     constructor(userEntity: UserEntity) : this(

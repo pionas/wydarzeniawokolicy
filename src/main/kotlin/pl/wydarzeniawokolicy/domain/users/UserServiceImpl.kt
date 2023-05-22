@@ -14,8 +14,8 @@ class UserServiceImpl(val userRepository: UserRepository, val userFactory: UserF
         return userRepository.save(userFactory.create(user))
     }
 
-    override fun update(userDetails: UserDetails): User {
-        return userRepository.save(userFactory.update(userDetails))
+    override fun update(userId: Long, userDetails: UserDetails): User {
+        return userRepository.save(userFactory.update(userId, userDetails))
     }
 
     override fun findById(userId: Long): User {

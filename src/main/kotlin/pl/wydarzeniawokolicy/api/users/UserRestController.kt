@@ -33,7 +33,7 @@ class UserRestController(
 
     @PutMapping("/{id}")
     fun update(@PathVariable("id") userId: Long, @RequestBody user: UserDetailsDto): ResponseEntity<UserDto> {
-        val createdUser = userService.update(userMapper.mapToDomain(user))
+        val createdUser = userService.update(userId, userMapper.mapToDomain(user))
         return ResponseEntity(userMapper.mapToDto(createdUser), HttpStatus.OK)
     }
 

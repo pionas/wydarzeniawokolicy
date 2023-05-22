@@ -8,7 +8,7 @@ interface UserRepository {
     fun findAll(): List<User>
     fun save(user: User): User
     fun findById(userId: Long): Optional<User>
+    fun findByName(name: String): Optional<User>
+    fun findByEmail(name: String): Optional<User>
     fun deleteById(userId: Long)
-    fun existsByName(name: String): Boolean
-    fun existsByEmail(email: String): Boolean
 }

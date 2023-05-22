@@ -1,11 +1,12 @@
 package pl.wydarzeniawokolicy.domain.users
 
 import lombok.AllArgsConstructor
-import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
+import pl.wydarzeniawokolicy.domain.shared.StringUtils
 import pl.wydarzeniawokolicy.domain.users.api.*
+import java.util.*
 
 
 @Component
@@ -13,21 +14,14 @@ import pl.wydarzeniawokolicy.domain.users.api.*
 class UserFactory(
     val userRepository: UserRepository,
     val dateTimeUtils: DateTimeUtils,
-    val passwordEncoder: PasswordEncoder
+    val passwordEncoder: PasswordEncoder,
+    val stringUtils: StringUtils,
 ) {
     fun create(userSignUp: UserSignUp): User {
-        if (userRepository.existsByName(userSignUp.name)) {
-            throw UserNameExistException(userSignUp.name)
-        }
-
-        if (userRepository.existsByEmail(userSignUp.email)) {
-            throw UserEmailExistException(userSignUp.email)
-        }
-
-        if (!userSignUp.validPassword()) {
-            throw UserInvalidPasswordException()
-        }
-        val salt = RandomStringUtils.randomAlphanumeric(10)
+        verifyName(null, userSignUp.name)
+        verifyEmail(null, userSignUp.email)
+        verifyPassword(userSignUp.password, userSignUp.passwordConfirm)
+        val salt = stringUtils.randomAlphanumeric(10)
         val password = passwordEncoder.encode(userSignUp.password.plus(salt))
         return User(
             null,
@@ -41,8 +35,56 @@ class UserFactory(
         )
     }
 
-    fun update(userDetails: UserDetails): User {
-        TODO("Not yet implemented")
+    fun update(userId: Long, userDetails: UserDetails): User {
+        val user = userRepository.findById(userId)
+            .orElseThrow {
+                return@orElseThrow UserNotFoundException(userId)
+            }
+        verifyName(user.id, userDetails.name)
+        verifyEmail(user.id, userDetails.email)
+        verifyPassword(userDetails.password, userDetails.passwordConfirm)
+        verifyCurrentPassword(user, userDetails.oldPassword)
+        user.update(userDetails, stringUtils, passwordEncoder, dateTimeUtils.getLocalDateTimeNow())
+        return userRepository.save(user)
+    }
+
+    private fun verifyName(id: Long?, name: String) {
+        val userByName = userRepository.findByName(name)
+        if (!userByName.isPresent) {
+            return
+        }
+        if (id == null) {
+            throw UserNameExistException(name)
+        }
+        if (!Objects.equals(userByName.get().name, name)) {
+            throw UserNameExistException(name)
+        }
+    }
+
+    private fun verifyEmail(id: Long?, email: String) {
+        val userByName = userRepository.findByEmail(email)
+        if (!userByName.isPresent) {
+            return
+        }
+        if (id == null) {
+            throw UserEmailExistException(email)
+        }
+        if (!Objects.equals(userByName.get().email, email)) {
+            throw UserEmailExistException(email)
+        }
+    }
+
+    private fun verifyPassword(password: String?, passwordConfirm: String?) {
+        if (password != passwordConfirm) {
+            throw UserPasswordCompareException()
+        }
+    }
+
+    private fun verifyCurrentPassword(user: User, oldPassword: String) {
+        val matches = passwordEncoder.matches(oldPassword.plus(user.salt), user.password)
+        if (!matches) {
+            throw UserInvalidPasswordException()
+        }
     }
 
 }
