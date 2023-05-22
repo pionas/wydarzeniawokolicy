@@ -10,7 +10,7 @@ import pl.wydarzeniawokolicy.domain.users.api.UserException
 import pl.wydarzeniawokolicy.domain.users.api.UserService
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @AllArgsConstructor
 class UserRestController(
     private val userService: UserService,
