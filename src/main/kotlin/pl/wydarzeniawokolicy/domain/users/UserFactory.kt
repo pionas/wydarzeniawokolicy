@@ -56,7 +56,7 @@ class UserFactory(
         if (id == null) {
             throw UserNameExistException(name)
         }
-        if (!Objects.equals(userByName.get().name, name)) {
+        if (!Objects.equals(userByName.get().id, id)) {
             throw UserNameExistException(name)
         }
     }
@@ -69,7 +69,7 @@ class UserFactory(
         if (id == null) {
             throw UserEmailExistException(email)
         }
-        if (!Objects.equals(userByName.get().email, email)) {
+        if (!Objects.equals(userByName.get().id, id)) {
             throw UserEmailExistException(email)
         }
     }

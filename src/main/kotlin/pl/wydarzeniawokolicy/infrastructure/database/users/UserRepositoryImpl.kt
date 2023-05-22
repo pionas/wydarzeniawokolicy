@@ -23,15 +23,17 @@ class UserRepositoryImpl(val userJpaRepository: UserJpaRepository) : UserReposit
             .map { User(it) }
     }
 
+    override fun findByName(name: String): Optional<User> {
+        return userJpaRepository.findByName(name)
+            .map { User(it) }
+    }
+
+    override fun findByEmail(email: String): Optional<User> {
+        return userJpaRepository.findByEmail(email)
+            .map { User(it) }
+    }
+
     override fun deleteById(userId: Long) {
         userJpaRepository.deleteById(userId)
-    }
-
-    override fun existsByName(name: String): Boolean {
-        return userJpaRepository.existsByName(name)
-    }
-
-    override fun existsByEmail(email: String): Boolean {
-        return userJpaRepository.existsByEmail(email)
     }
 }

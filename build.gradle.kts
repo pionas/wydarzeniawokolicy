@@ -23,8 +23,8 @@ repositories {
     mavenCentral()
 }
 
-extra["vaadinVersion"] = "24.0.5"
-extra["mapstructVersion"] = "1.5.5.Final"
+val vaadinVersion = "24.0.5"
+val mapstructVersion = "1.5.5.Final"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
@@ -35,20 +35,21 @@ dependencies {
     implementation("com.vaadin:vaadin-spring-boot-starter")
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
-    kapt("org.mapstruct:mapstruct-processor:${property("mapstructVersion")}")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
 }
 
 dependencyManagement {
     imports {
-        mavenBom("com.vaadin:vaadin-bom:${property("vaadinVersion")}")
+        mavenBom("com.vaadin:vaadin-bom:$vaadinVersion")
     }
 }
 
