@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
@@ -16,8 +15,8 @@ import java.time.LocalDateTime
 data class SignUpDto(
     @field:NotEmpty @field:Size(min = 3, max = 50) var name: String?,
     @field:NotEmpty @field:Email var email: String?,
-    @field:NotEmpty @field:Min(5) var password: String?,
-    @field:NotEmpty @field:Min(5) @JsonProperty(value = "passwordConfirm") var passwordConfirm: String?
+    @field:NotEmpty @field:Size(min = 5) var password: String?,
+    @field:NotEmpty @field:Size(min = 5) @JsonProperty(value = "passwordConfirm") var passwordConfirm: String?
 )
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -33,7 +32,7 @@ data class UserDto(
 data class UserDetailsDto(
     @field:NotEmpty @field:Size(min = 3, max = 50) val name: String,
     @field:NotEmpty @field:Email val email: String,
-    @field:NotEmpty @field:Min(5) val oldPassword: String,
-    @field:Min(5) val password: String?,
-    @field:Min(5) val passwordConfirm: String?
+    @field:NotEmpty @field:Size(min = 5) val oldPassword: String,
+    @field:Size(min = 5) val password: String?,
+    @field:Size(min = 5) val passwordConfirm: String?
 )

@@ -22,7 +22,7 @@ class UserRestController(
     fun getAll(): List<UserDto> = userMapper.mapToDto(userService.findAll())
 
     @PostMapping("")
-    fun create(@RequestBody signUpDto: SignUpDto): ResponseEntity<UserDto> {
+    fun create(@Valid @RequestBody signUpDto: SignUpDto): ResponseEntity<UserDto> {
         val createdUser = userService.create(userMapper.mapToDomain(signUpDto))
         return ResponseEntity(userMapper.mapToDto(createdUser), HttpStatus.CREATED)
     }
