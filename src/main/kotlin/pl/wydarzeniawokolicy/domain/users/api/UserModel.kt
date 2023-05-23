@@ -1,6 +1,5 @@
 package pl.wydarzeniawokolicy.domain.users.api
 
-import lombok.EqualsAndHashCode
 import org.springframework.security.crypto.password.PasswordEncoder
 import pl.wydarzeniawokolicy.domain.shared.BasicModel
 import pl.wydarzeniawokolicy.domain.shared.StringUtils
@@ -13,15 +12,10 @@ class UserDetails(
     val oldPassword: String,
     val password: String?,
     val passwordConfirm: String?
-) {
-    fun validPassword(): Boolean = password == passwordConfirm
-}
+)
 
-class UserSignUp(val name: String, val email: String, val password: String, val passwordConfirm: String) {
-    fun validPassword(): Boolean = password == passwordConfirm
-}
+class UserSignUp(val name: String, val email: String, val password: String, val passwordConfirm: String)
 
-@EqualsAndHashCode
 class User(
     val id: Long?, var name: String, var email: String, var password: String?, var salt: String?,
     createdAt: LocalDateTime,
