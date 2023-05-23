@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.wydarzeniawokolicy.domain.users.api.UserException
+import pl.wydarzeniawokolicy.domain.users.api.UserNotFoundException
 import pl.wydarzeniawokolicy.domain.users.api.UserService
 
 @RestController
@@ -21,7 +22,7 @@ class UserRestController(
     fun getAll(): List<UserDto> = userMapper.mapToDto(userService.findAll())
 
     @PostMapping("")
-    fun create(@Valid @RequestBody signUpDto: SignUpDto): ResponseEntity<UserDto> {
+    fun create(@RequestBody signUpDto: SignUpDto): ResponseEntity<UserDto> {
         val createdUser = userService.create(userMapper.mapToDomain(signUpDto))
         return ResponseEntity(userMapper.mapToDto(createdUser), HttpStatus.CREATED)
     }
@@ -41,6 +42,11 @@ class UserRestController(
     fun delete(@PathVariable("id") userId: Long): ResponseEntity<Void> {
         userService.deleteById(userId)
         return ResponseEntity(HttpStatus.OK)
+    }
+
+    @ExceptionHandler(UserNotFoundException::class)
+    fun userException(exception: UserNotFoundException): ResponseEntity<String> {
+        return ResponseEntity(exception.message, HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(UserException::class)

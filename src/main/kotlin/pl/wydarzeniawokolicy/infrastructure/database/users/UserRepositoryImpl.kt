@@ -3,7 +3,6 @@ package pl.wydarzeniawokolicy.infrastructure.database.users
 import org.springframework.stereotype.Repository
 import pl.wydarzeniawokolicy.domain.users.UserRepository
 import pl.wydarzeniawokolicy.domain.users.api.User
-import java.time.LocalDateTime
 import java.util.*
 
 @Repository
@@ -14,7 +13,7 @@ class UserRepositoryImpl(val userJpaRepository: UserJpaRepository) : UserReposit
     }
 
     override fun save(user: User): User {
-        val userEntity = UserEntity(user.id, user.name, user.email, "", "", LocalDateTime.now(), null, null)
+        val userEntity = UserEntity(user.id, user.name, user.email, user.password!!, user.salt!!, user.createdAt, user.updatedAt, user.deletedAt)
         return User(userJpaRepository.save(userEntity))
     }
 
