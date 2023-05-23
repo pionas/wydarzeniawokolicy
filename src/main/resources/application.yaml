@@ -1,0 +1,20 @@
+server:
+  port: 7777
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: databaseUser
+    password: databasePassword
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+
+flyway:
+  user: databaseUser
+  password: databasePassword
+  url: jdbc:h2:mem:db
+  locations: db/migration
