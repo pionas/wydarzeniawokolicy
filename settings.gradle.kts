@@ -1,1 +1,1 @@
-rootProject.name = "WydarzeniaWOkolicy"
+rootProject.name = "wydarzeniawokolicy"
