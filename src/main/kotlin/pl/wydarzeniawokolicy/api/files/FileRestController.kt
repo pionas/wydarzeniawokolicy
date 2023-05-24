@@ -1,7 +1,6 @@
 package pl.wydarzeniawokolicy.api.files
 
 import jakarta.validation.Valid
-import lombok.AllArgsConstructor
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,7 +9,6 @@ import pl.wydarzeniawokolicy.domain.files.api.FileService
 
 @RestController
 @RequestMapping("/api/v1/files")
-@AllArgsConstructor
 class FileRestController(
     private val service: FileService,
     private val mapper: FileMapper,

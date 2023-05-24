@@ -2,7 +2,6 @@ package pl.wydarzeniawokolicy.api.users
 
 
 import jakarta.validation.Valid
-import lombok.AllArgsConstructor
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,7 +9,6 @@ import pl.wydarzeniawokolicy.domain.users.api.UserService
 
 @RestController
 @RequestMapping("/api/v1/users")
-@AllArgsConstructor
 class UserRestController(
     private val userService: UserService,
     private val userMapper: UserMapper

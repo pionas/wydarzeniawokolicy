@@ -1,6 +1,5 @@
 package pl.wydarzeniawokolicy.domain.users
 
-import lombok.AllArgsConstructor
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
@@ -8,9 +7,7 @@ import pl.wydarzeniawokolicy.domain.shared.StringUtils
 import pl.wydarzeniawokolicy.domain.users.api.*
 import java.util.*
 
-
 @Component
-@AllArgsConstructor
 class UserFactory(
     val userRepository: UserRepository,
     val dateTimeUtils: DateTimeUtils,
