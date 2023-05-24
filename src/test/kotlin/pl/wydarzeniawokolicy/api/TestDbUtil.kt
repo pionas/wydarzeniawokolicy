@@ -21,7 +21,8 @@ open class TestDbUtil(private val entityManager: EntityManager) {
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate()
     }
 
-    fun em(): EntityManager {
+    @Transactional
+    open fun em(): EntityManager {
         return entityManager
     }
 

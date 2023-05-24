@@ -10,6 +10,7 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
 import pl.wydarzeniawokolicy.domain.shared.FileUtils
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -22,8 +23,10 @@ class FileFactoryTest {
     fun shouldCreateFile() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
+        val localDate = LocalDate.of(2023, 5, 22)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
-        whenever(fileUtils.saveFile(any(), any())).thenReturn("path/to/file.png")
+        whenever(dateTimeUtils.getLocalDateNow()).thenReturn(localDate)
+        whenever(fileUtils.upload(any(), any())).thenReturn("path/to/file.png")
         whenever(fileUtils.getHash(any())).thenReturn("hashmd5")
         // when
         val file = fileFactory.create(getFile())

@@ -6,6 +6,7 @@ import pl.wydarzeniawokolicy.domain.files.api.File
 @Mapper(componentModel = "spring")
 interface FileMapper {
 
-    fun mapToDto(createdUser: File): FileDto
+    fun mapToDto(file: File): FileDto
+    fun mapToDto(files: List<File>): List<FileDto>
 
 }

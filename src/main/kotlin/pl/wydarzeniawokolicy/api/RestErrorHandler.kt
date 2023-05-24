@@ -1,5 +1,6 @@
 package pl.wydarzeniawokolicy.api
 
+import lombok.extern.java.Log
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 
 @ControllerAdvice(basePackageClasses = [RestErrorHandler::class])
+@Log
 class RestErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

@@ -1,13 +1,15 @@
 package pl.wydarzeniawokolicy.infrastructure.database.files
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "files")
 data class FileEntity(
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var hash: String,
     var name: String,
     var path: String,

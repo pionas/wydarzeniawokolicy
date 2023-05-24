@@ -1,5 +1,6 @@
 package pl.wydarzeniawokolicy.infrastructure.shared
 
+import org.apache.commons.io.FileUtils.copyInputStreamToFile
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import pl.wydarzeniawokolicy.domain.shared.FileUtils
@@ -13,12 +14,12 @@ import java.security.MessageDigest
 @Component
 class FileUtilsImpl(val stringUtils: StringUtils) : FileUtils {
 
-    override fun saveFile(uploadDirectory: String, file: MultipartFile): String {
+    override fun upload(uploadDirectory: String, file: MultipartFile): String {
         val uploadsFolderPath: Path = Paths.get(uploadDirectory)
         val fileName = stringUtils.randomAlphanumeric(10).plus("_").plus(file.originalFilename)
-        val uploadedTargetFilePath = uploadsFolderPath.resolve(fileName)
-        Files.copy(file.inputStream, uploadedTargetFilePath)
-        return uploadDirectory.plus(fileName)
+        val targetFile = uploadsFolderPath.resolve(fileName).toFile()
+        copyInputStreamToFile(file.inputStream, targetFile)
+        return uploadDirectory.plus("/").plus(fileName)
     }
 
     override fun getHash(filePath: String): String {
