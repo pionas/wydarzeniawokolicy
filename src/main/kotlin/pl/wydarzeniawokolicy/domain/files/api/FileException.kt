@@ -1,4 +1,5 @@
 package pl.wydarzeniawokolicy.domain.files.api
 
-open class FileException(message: String) : RuntimeException(message)
-class FileNotFoundException(hash: String) : FileException("File by hash $hash not exists")
+import pl.wydarzeniawokolicy.domain.shared.NotFoundException
+
+class FileNotFoundException(hash: String) : NotFoundException("File by hash $hash not exists")

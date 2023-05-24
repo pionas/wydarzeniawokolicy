@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import pl.wydarzeniawokolicy.domain.users.api.UserException
-import pl.wydarzeniawokolicy.domain.users.api.UserNotFoundException
 import pl.wydarzeniawokolicy.domain.users.api.UserService
 
 @RestController
@@ -42,15 +40,5 @@ class UserRestController(
     fun delete(@PathVariable("id") userId: Long): ResponseEntity<Void> {
         userService.deleteById(userId)
         return ResponseEntity(HttpStatus.OK)
-    }
-
-    @ExceptionHandler(UserNotFoundException::class)
-    fun userException(exception: UserNotFoundException): ResponseEntity<String> {
-        return ResponseEntity(exception.message, HttpStatus.NOT_FOUND)
-    }
-
-    @ExceptionHandler(UserException::class)
-    fun userException(exception: UserException): ResponseEntity<String> {
-        return ResponseEntity(exception.message, HttpStatus.BAD_REQUEST)
     }
 }
