@@ -19,10 +19,7 @@ class UserServiceImpl(val userRepository: UserRepository, val userFactory: UserF
     }
 
     override fun findById(userId: Long): User {
-        return userRepository.findById(userId)
-            .orElseThrow {
-                return@orElseThrow UserNotFoundException(userId)
-            }
+        return userRepository.findById(userId) ?: throw UserNotFoundException(userId)
     }
 
     override fun deleteById(userId: Long) {

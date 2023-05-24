@@ -36,10 +36,7 @@ class UserFactory(
     }
 
     fun update(userId: Long, userDetails: UserDetails): User {
-        val user = userRepository.findById(userId)
-            .orElseThrow {
-                return@orElseThrow UserNotFoundException(userId)
-            }
+        val user = userRepository.findById(userId) ?: throw UserNotFoundException(userId)
         verifyName(user.id, userDetails.name)
         verifyEmail(user.id, userDetails.email)
         verifyPassword(userDetails.password, userDetails.passwordConfirm)
@@ -49,27 +46,21 @@ class UserFactory(
     }
 
     private fun verifyName(id: Long?, name: String) {
-        val userByName = userRepository.findByName(name)
-        if (!userByName.isPresent) {
-            return
-        }
+        val userByName = userRepository.findByName(name) ?: return
         if (id == null) {
             throw UserNameExistException(name)
         }
-        if (!Objects.equals(userByName.get().id, id)) {
+        if (!Objects.equals(userByName.id, id)) {
             throw UserNameExistException(name)
         }
     }
 
     private fun verifyEmail(id: Long?, email: String) {
-        val userByName = userRepository.findByEmail(email)
-        if (!userByName.isPresent) {
-            return
-        }
+        val userByName = userRepository.findByEmail(email) ?: return
         if (id == null) {
             throw UserEmailExistException(email)
         }
-        if (!Objects.equals(userByName.get().id, id)) {
+        if (!Objects.equals(userByName.id, id)) {
             throw UserEmailExistException(email)
         }
     }

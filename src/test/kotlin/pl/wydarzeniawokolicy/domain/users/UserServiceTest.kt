@@ -128,7 +128,7 @@ class UserServiceTest {
             LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
             LocalDateTime.of(2023, 5, 22, 19, 12, 0, 0)
         )
-        whenever(repository.findById(user.id!!)).thenReturn(Optional.of(user))
+        whenever(repository.findById(user.id!!)).thenReturn(user)
         // when
         val userDetails = service.findById(user.id!!)
         // then
@@ -147,7 +147,7 @@ class UserServiceTest {
     fun shouldThrowExceptionWhenUserByIdNotExist() {
         // given
         val userId = 1L
-        whenever(repository.findById(userId)).thenReturn(Optional.empty())
+        whenever(repository.findById(userId)).thenReturn(null)
         // when
         val exception =
             Assertions.catchThrowableOfType({ service.findById(userId) }, UserNotFoundException::class.java)

@@ -10,7 +10,6 @@ import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
 import pl.wydarzeniawokolicy.domain.shared.StringUtils
 import pl.wydarzeniawokolicy.domain.users.api.*
 import java.time.LocalDateTime
-import java.util.*
 
 class UserFactoryTest {
 
@@ -24,7 +23,7 @@ class UserFactoryTest {
     fun shouldThrowExceptionWhenUserByNameExist() {
         // given
         val userSignUp = getUserSignUp("password", "passwordConfirm")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(Optional.of(getUser(1L, null, "name", "email")))
+        whenever(repository.findByName(userSignUp.name)).thenReturn(getUser(1L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.create(userSignUp) }, UserNameExistException::class.java)
@@ -36,8 +35,8 @@ class UserFactoryTest {
     fun shouldThrowExceptionWhenUserByEmailExist() {
         // given
         val userSignUp = getUserSignUp("password", "passwordConfirm")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userSignUp.email)).thenReturn(Optional.of(getUser(1L, null, "name", "email")))
+        whenever(repository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(repository.findByEmail(userSignUp.email)).thenReturn(getUser(1L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.create(userSignUp) }, UserEmailExistException::class.java)
@@ -49,8 +48,8 @@ class UserFactoryTest {
     fun shouldThrowExceptionWhenUserPasswordNotMatches() {
         // given
         val userSignUp = getUserSignUp("password", "passwordConfirm")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userSignUp.email)).thenReturn(Optional.empty())
+        whenever(repository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(repository.findByEmail(userSignUp.email)).thenReturn(null)
         // when
         val exception =
             catchThrowableOfType({ userFactory.create(userSignUp) }, UserPasswordCompareException::class.java)
@@ -64,8 +63,8 @@ class UserFactoryTest {
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         val salt = "salt"
         val userSignUp = getUserSignUp("validPassword", "validPassword")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userSignUp.email)).thenReturn(Optional.empty())
+        whenever(repository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(repository.findByEmail(userSignUp.email)).thenReturn(null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
         // when
@@ -85,7 +84,7 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(Optional.empty())
+        whenever(repository.findById(userId)).thenReturn(null)
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserNotFoundException::class.java)
@@ -98,8 +97,8 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(Optional.of(getUser(userId, null, "name", "email")))
-        whenever(repository.findByName(userDetails.name)).thenReturn(Optional.of(getUser(2L, null, "name", "email")))
+        whenever(repository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
+        whenever(repository.findByName(userDetails.name)).thenReturn(getUser(2L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserNameExistException::class.java)
@@ -112,9 +111,9 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(Optional.of(getUser(userId, null, "name", "email")))
-        whenever(repository.findByName(userDetails.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(Optional.of(getUser(2L, null, "name", "email")))
+        whenever(repository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
+        whenever(repository.findByName(userDetails.name)).thenReturn(null)
+        whenever(repository.findByEmail(userDetails.email)).thenReturn(getUser(2L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserEmailExistException::class.java)
@@ -127,9 +126,9 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(Optional.of(getUser(1L, null, "name", "email")))
-        whenever(repository.findByName(userDetails.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(Optional.empty())
+        whenever(repository.findById(userId)).thenReturn(getUser(1L, null, "name", "email"))
+        whenever(repository.findByName(userDetails.name)).thenReturn(null)
+        whenever(repository.findByEmail(userDetails.email)).thenReturn(null)
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserPasswordCompareException::class.java)
@@ -143,9 +142,9 @@ class UserFactoryTest {
         val userId = 1L
         val userDetails = getUserDetails("password", "password")
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
-        whenever(repository.findById(userId)).thenReturn(Optional.of(getUser(userId, null, "name", "email")))
-        whenever(repository.findByName(userDetails.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(Optional.empty())
+        whenever(repository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
+        whenever(repository.findByName(userDetails.name)).thenReturn(null)
+        whenever(repository.findByEmail(userDetails.email)).thenReturn(null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         // when
         val exception =
@@ -162,17 +161,15 @@ class UserFactoryTest {
         val userDetails = getUserDetails("password", "password")
         val localDateTime = LocalDateTime.of(2023, 5, 22, 19, 3, 0, 0)
         whenever(repository.findById(userId)).thenReturn(
-            Optional.of(
-                getUser(
-                    userId,
-                    "\$2a\$10\$xAsTwpeJHG.nAfBZsyfrCOWJOfsZ2lZ3k73qeYP8eGMLeusQ.JlFi",
-                    "name",
-                    "email"
-                )
+            getUser(
+                userId,
+                "\$2a\$10\$xAsTwpeJHG.nAfBZsyfrCOWJOfsZ2lZ3k73qeYP8eGMLeusQ.JlFi",
+                "name",
+                "email"
             )
         )
-        whenever(repository.findByName(userDetails.name)).thenReturn(Optional.empty())
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(Optional.empty())
+        whenever(repository.findByName(userDetails.name)).thenReturn(null)
+        whenever(repository.findByEmail(userDetails.email)).thenReturn(null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
         // when
