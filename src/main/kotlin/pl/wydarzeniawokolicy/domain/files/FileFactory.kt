@@ -6,10 +6,6 @@ import org.springframework.web.multipart.MultipartFile
 import pl.wydarzeniawokolicy.domain.files.api.File
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
 import pl.wydarzeniawokolicy.domain.shared.FileUtils
-import java.math.BigInteger
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.security.MessageDigest
 
 
 @Component

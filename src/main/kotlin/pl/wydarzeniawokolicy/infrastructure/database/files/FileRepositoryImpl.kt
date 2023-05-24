@@ -3,7 +3,6 @@ package pl.wydarzeniawokolicy.infrastructure.database.files
 import org.springframework.stereotype.Repository
 import pl.wydarzeniawokolicy.domain.files.FileRepository
 import pl.wydarzeniawokolicy.domain.files.api.File
-import java.util.*
 
 @Repository
 class FileRepositoryImpl(val fileJpaRepository: FileJpaRepository) : FileRepository {
@@ -18,9 +17,10 @@ class FileRepositoryImpl(val fileJpaRepository: FileJpaRepository) : FileReposit
         return File(fileJpaRepository.save(fileEntity))
     }
 
-    override fun findByHash(hash: String): Optional<File> {
+    override fun findByHash(hash: String): File? {
         return fileJpaRepository.findById(hash)
             .map { File(it) }
+            .orElse(null)
     }
 
     override fun deleteByHash(hash: String) {
