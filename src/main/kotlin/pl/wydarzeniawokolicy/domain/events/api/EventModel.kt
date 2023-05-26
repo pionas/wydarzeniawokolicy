@@ -45,7 +45,7 @@ class GeoLocation(var coordinatesLatitude: Float?, var coordinatesLongitude: Flo
     )
 }
 
-class Sender(var name: String?, var email: String?, var userId: Long?) {
+class Sender(var name: String? = null, var email: String? = null, var userId: Long? = null) {
     constructor(senderEmbeddable: SenderEmbeddable) : this(
         name = senderEmbeddable.name,
         email = senderEmbeddable.email,
