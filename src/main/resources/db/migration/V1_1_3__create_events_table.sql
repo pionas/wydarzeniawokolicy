@@ -1,0 +1,26 @@
+create table events
+(
+    slug                  varchar(255) not null,
+    name                  varchar(255),
+    active                boolean      not null,
+    description           text,
+    content               text,
+    online                boolean      not null,
+    promo                 boolean      not null,
+    ticket_website        varchar(255),
+    website               varchar(255),
+    city                  varchar(50),
+    country               varchar(100),
+    voivodeship           varchar(25),
+    street                varchar(150),
+    apartment             varchar(10),
+    coordinates_latitude  float(24),
+    coordinates_longitude float(24),
+    sender_email          varchar(255),
+    sender_name           varchar(255),
+    sender_user_id        bigint,
+    created_at            timestamp    NOT NULL,
+    updated_at            timestamp    NULL DEFAULT NULL,
+    deleted_at            timestamp    NULL DEFAULT NULL,
+    primary key (slug)
+)

@@ -6,6 +6,7 @@ import pl.wydarzeniawokolicy.domain.categories.api.CategoryException
 import pl.wydarzeniawokolicy.domain.categories.api.CategoryService
 import pl.wydarzeniawokolicy.domain.categories.api.NewCategory
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
+import pl.wydarzeniawokolicy.domain.shared.SlugHelper
 import pl.wydarzeniawokolicy.domain.shared.StringUtils
 import java.util.*
 
@@ -58,25 +59,7 @@ class CategoryServiceImpl(
     }
 
     private fun getSlug(newCategory: NewCategory): String {
-        return newCategory.slug ?: generateSlug(stringUtils.slug(newCategory.name))
-    }
-
-    private fun generateSlug(slug: String): String {
-        var i = 0
-        var newSlug: String?
-        do {
-            newSlug = getSlug(slug, i)
-            val exists = categoryRepository.existsBySlug(newSlug)
-            i++
-        } while (exists)
-        return newSlug!!
-    }
-
-    private fun getSlug(slug: String, index: Int): String {
-        return when (index) {
-            0 -> slug
-            else -> slug.plus(index)
-        }
+        return newCategory.slug ?: SlugHelper.generateSlug(categoryRepository, stringUtils.slug(newCategory.name))
     }
 
 }
