@@ -10,7 +10,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler
 @TestConfiguration
 class RestITConfig {
 
-    private val ROOT_URI = "http://localhost:7777/api/v1"
+    private val ROOT_URI = "http://localhost:7778/api/v1"
 
     @Bean
     fun testRestTemplate(): TestRestTemplate {
