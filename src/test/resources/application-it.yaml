@@ -27,3 +27,11 @@ logging:
     org:
       springframework:
         security: debug
+
+users:
+  valid:
+    username: admin
+    password: admin
+  invalid:
+    username: user
+    password: userpass

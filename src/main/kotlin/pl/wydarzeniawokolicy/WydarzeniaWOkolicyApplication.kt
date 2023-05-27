@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class WydarzeniaWOkolicyApplication
 
 fun main(args: Array<String>) {
-	runApplication<WydarzeniaWOkolicyApplication>(*args)
+    runApplication<WydarzeniaWOkolicyApplication>(*args)
 }
