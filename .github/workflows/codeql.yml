@@ -39,6 +39,13 @@ jobs:
           languages: ${{ matrix.language }}
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Run Tests
+        run: ./gradlew test
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-branches-badge: true
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:

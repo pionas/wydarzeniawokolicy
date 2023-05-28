@@ -8,6 +8,7 @@ plugins {
     kotlin("kapt") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
+    id("jacoco")
 }
 
 group = "pl.wydarzeniawokolicy"
@@ -54,6 +55,14 @@ dependencyManagement {
     }
 }
 
+tasks.withType<JacocoReport> {
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(false)
+    }
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
@@ -63,4 +72,5 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
