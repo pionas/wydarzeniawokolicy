@@ -276,9 +276,9 @@ class CategoryServiceTest {
             localDateTime,
             localDateTime.plusDays(1)
         )
-        whenever(repository.findBySlug(category.slug!!)).thenReturn(category)
+        whenever(repository.findBySlug(category.slug)).thenReturn(category)
         // when
-        val categoryDetails = service.findBySlug(category.slug!!)
+        val categoryDetails = service.findBySlug(category.slug)
         // then
         Assertions.assertThat(categoryDetails)
             .hasFieldOrPropertyWithValue("name", category.name)

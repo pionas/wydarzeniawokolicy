@@ -21,7 +21,7 @@ class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRe
     override fun create(category: Category): Category {
         val categoryEntity = CategoryEntity(
             name = category.name,
-            slug = category.slug!!,
+            slug = category.slug,
             createdAt = category.createdAt,
             updatedAt = category.updatedAt,
             deletedAt = category.deletedAt

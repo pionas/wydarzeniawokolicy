@@ -16,6 +16,6 @@ data class CategoryDto(
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class NewCategoryDto(
-    @field:NotEmpty @field:Size(min = 3, max = 103) var name: String?,
+    @field:NotEmpty @field:Size(min = 3, max = 100) var name: String?,
     @field:Size(min = 3, max = 103) var slug: String?,
 )

@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 class NewCategory(val name: String, var slug: String?)
 class Category(
-    var name: String, var slug: String?,
+    var name: String, var slug: String,
     createdAt: LocalDateTime,
     updatedAt: LocalDateTime? = null,
     deletedAt: LocalDateTime? = null
