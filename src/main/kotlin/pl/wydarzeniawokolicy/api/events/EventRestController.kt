@@ -27,6 +27,15 @@ class EventRestController(
         return ResponseEntity(mapper.mapToDto(service.findBySlug(slug)), HttpStatus.OK)
     }
 
+    @PutMapping("/{slug}")
+    fun update(
+        @PathVariable("slug") slug: String,
+        @Valid @RequestBody event: NewEventDto
+    ): ResponseEntity<EventDto> {
+        val createdRole = service.update(slug, mapper.mapToDomain(event, getSenderDetails()))
+        return ResponseEntity(mapper.mapToDto(createdRole), HttpStatus.OK)
+    }
+
     @DeleteMapping("/{slug}")
     fun delete(@PathVariable("slug") slug: String): ResponseEntity<Void> {
         service.delete(slug)

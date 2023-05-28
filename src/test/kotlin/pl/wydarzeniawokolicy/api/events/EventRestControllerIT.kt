@@ -1,12 +1,15 @@
 package pl.wydarzeniawokolicy.api.events
 
 import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.whenever
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -14,7 +17,9 @@ import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlConfig
 import org.springframework.web.client.HttpClientErrorException
 import pl.wydarzeniawokolicy.api.BasicIT
+import pl.wydarzeniawokolicy.infrastructure.database.events.EventEntity
 import java.time.LocalDateTime
+import java.util.stream.Stream
 
 
 internal class EventRestControllerIT : BasicIT() {
@@ -138,24 +143,147 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    fun shouldUpdateEventDetails() {
+    fun shouldReturnInternalServerErrorWhenTryUpdate() {
+        // given
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { restTemplate.put("/events/event-1", HashMap<String, Any>(), Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.BAD_REQUEST, result?.statusCode)
     }
 
     @Test
-    fun shouldReturnNotFoundWhenTryUpdateEventDetailsButEventNotExist() {
+    fun shouldReturnNotFoundWhenTryUpdateByEventNotExist() {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        val eventDto = NewEventDto("Event 1", "event-1")
+        // when
+        val requestEntity = HttpEntity(eventDto)
+        val result =
+            Assertions.catchThrowableOfType(
+                {
+                    restTemplate.exchange(
+                        "/events/event-not-exist",
+                        HttpMethod.PUT,
+                        requestEntity,
+                        NewEventDto::class.java
+                    )
+                },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.NOT_FOUND, result?.statusCode)
     }
 
     @Test
-    fun shouldReturnNotFoundWhenTryUpdateEventDetails() {
-        // null, empty invalid name, email, password, passwordConfirm
+    @Sql("/db/events.sql")
+    fun shouldReturnBadRequestWhenTryUpdateButEventSlugExist() {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        val eventDto = NewEventDto("Event 1", "dzien-dziecka-w-parku-szczesliwickim")
+        // when
+        val requestEntity = HttpEntity(eventDto)
+        val result =
+            Assertions.catchThrowableOfType(
+                {
+                    restTemplate.exchange(
+                        "/events/pajaki-i-skorpiony",
+                        HttpMethod.PUT,
+                        requestEntity,
+                        NewEventDto::class.java
+                    )
+                },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.BAD_REQUEST, result?.statusCode)
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEventDtoList")
+    fun shouldReturnBadRequestWhenTryUpdate(eventName: String, eventSlug: String?, message: String) {
+        // given
+        val eventDto = NewEventDto(eventName, eventSlug)
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { restTemplate.put("/events/pajaki-i-skorpiony", eventDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.BAD_REQUEST, result!!.statusCode)
+        assertTrue(result.message!!.contains(message))
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEventsDtoValidList")
+    @Sql("/db/events.sql")
+    fun shouldUpdate(eventName: String, eventSlug: String?, expectedEventSlug: String) {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 27, 8, 55, 0, 0)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        val eventDto = NewEventDto(eventName, eventSlug)
+        // when
+        val requestEntity = HttpEntity(eventDto)
+        val event: ResponseEntity<EventDto> =
+            restTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.PUT, requestEntity, EventDto::class.java)
+        // then
+        assertNotNull(event)
+        assertEquals(HttpStatus.OK, event.statusCode)
+        Assertions.assertThat(event.body)
+            .hasFieldOrPropertyWithValue("name", eventName)
+            .hasFieldOrPropertyWithValue("slug", expectedEventSlug)
+            .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 27, 7, 55, 0, 0))
+            .hasFieldOrPropertyWithValue("updatedAt", localDateTime)
     }
 
     @Test
+    @Sql("/db/events.sql")
     fun shouldDelete() {
         // given
         // when
-        val result = restTemplate.exchange("/events/100", HttpMethod.DELETE, null, Any::class.java)
+        val result = restTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
+        val entity = dbUtils.em().find(EventEntity::class.java, "pajaki-i-skorpiony")
+        assertNull(entity)
+    }
+
+    companion object {
+        @JvmStatic
+        private fun provideEventDtoList(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of("Na", null, "newEventDto.name"),
+                Arguments.of("Event", "ro", "newEventDto.slug"),
+                Arguments.of(
+                    "VeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventName",
+                    null,
+                    "newEventDto.name"
+                ),
+                Arguments.of(
+                    "Event Ok",
+                    "VeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventNameVeryLongEventName",
+                    "newEventDto.slug"
+                )
+            )
+        }
+
+        @JvmStatic
+        private fun provideEventsDtoValidList(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of("NewEventName", null, "neweventname"),
+                Arguments.of("NewEventName", "new-event-name", "new-event-name"),
+                Arguments.of("Kopernik i jego świat", null, "kopernik-i-jego-swiat1"),
+            )
+        }
     }
 }
