@@ -41,8 +41,6 @@ jobs:
           languages: ${{ matrix.language }}
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Run Tests
-        run: ./gradlew test
       - name: Generate JaCoCo Badge
         uses: cicirello/jacoco-badge-generator@v2
         with:
