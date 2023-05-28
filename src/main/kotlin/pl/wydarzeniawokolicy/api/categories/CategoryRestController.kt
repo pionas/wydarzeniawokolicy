@@ -27,6 +27,15 @@ class CategoryRestController(
         return ResponseEntity(mapper.mapToDto(service.findBySlug(slug)), HttpStatus.OK)
     }
 
+    @PutMapping("/{slug}")
+    fun update(
+        @PathVariable("slug") slug: String,
+        @Valid @RequestBody category: NewCategoryDto
+    ): ResponseEntity<CategoryDto> {
+        val createdRole = service.update(slug, mapper.mapToDomain(category))
+        return ResponseEntity(mapper.mapToDto(createdRole), HttpStatus.OK)
+    }
+
     @DeleteMapping("/{slug}")
     fun delete(@PathVariable("slug") slug: String): ResponseEntity<Void> {
         service.delete(slug)
