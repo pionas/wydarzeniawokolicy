@@ -36,18 +36,19 @@ class SecurityConfig {
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf()
-            .disable()
+        http.httpBasic().and()
+            .anonymous()
+            .and()
             .authorizeHttpRequests()
-            .requestMatchers("/**")
-            .permitAll()
-            .anyRequest()
-            .authenticated()
+            .requestMatchers("/**").permitAll()
             .and()
-            .httpBasic()
+            .formLogin().loginPage("/login").permitAll()
             .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .logout().logoutSuccessUrl("/")
+            .and()
+            .csrf().disable()
+            .cors().disable()
+            .headers().disable()
         return http.build()
     }
 
