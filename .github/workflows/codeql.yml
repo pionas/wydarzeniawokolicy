@@ -46,6 +46,10 @@ jobs:
         with:
           generate-branches-badge: true
           jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: './.github/badges/jacoco.svg'
+          message: 'Commit Code Coverage Image to Repo'
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
