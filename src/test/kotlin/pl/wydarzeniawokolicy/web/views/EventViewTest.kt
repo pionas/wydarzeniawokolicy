@@ -1,16 +1,22 @@
 package pl.wydarzeniawokolicy.web.views
 
-import com.vaadin.testbench.unit.SpringUIUnitTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import com.github.mvysny.dynatest.DynaTest
+import com.github.mvysny.kaributesting.v10._get
+import com.github.mvysny.kaributesting.v10.expectRows
+import com.github.mvysny.kaributools.navigateTo
+import com.vaadin.flow.component.grid.Grid
+import pl.wydarzeniawokolicy.domain.events.api.Event
 
-@SpringBootTest
-class EventViewTest : SpringUIUnitTest() {
+class EventViewTest : DynaTest({
 
-    @Test
-    fun shouldComponentCount() {
-        val view: EventView = navigate(EventView::class.java)
-        assertEquals(2, view.componentCount)
+    usingApp()
+
+    beforeEach {
+        navigateTo<EventView>()
     }
-}
+
+    test("show event grid") {
+        val grid = _get<Grid<Event>>()
+        grid.expectRows(0)
+    }
+})

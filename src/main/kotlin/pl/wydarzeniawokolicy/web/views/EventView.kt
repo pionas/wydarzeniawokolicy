@@ -13,7 +13,7 @@ import pl.wydarzeniawokolicy.web.MainLayout
 import java.util.function.Consumer
 
 
-@Route(value = "", layout = MainLayout::class)
+@Route(value = "")
 @AnonymousAllowed
 class EventView : HorizontalLayout() {
 

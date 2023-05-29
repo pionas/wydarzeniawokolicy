@@ -47,9 +47,8 @@ dependencies {
     }
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("com.vaadin:vaadin-testbench-unit-junit5:9.0.4")
+    testImplementation("com.github.mvysny.kaributesting:karibu-testing-v24:2.0.2")
+    testImplementation("com.github.mvysny.dynatest:dynatest:0.24")
 }
 
 dependencyManagement {
