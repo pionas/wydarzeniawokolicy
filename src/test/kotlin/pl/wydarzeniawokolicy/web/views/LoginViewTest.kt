@@ -20,7 +20,6 @@ class LoginViewTest : DynaTest({
         val loginForm = _get<LoginForm>()
         val header = _get<H1>()
         expect("Vaadin CRM") { header.text }
-        expect("Vaadin CRM") { header.text }
         expect("login") { loginForm.action }
     }
 })
