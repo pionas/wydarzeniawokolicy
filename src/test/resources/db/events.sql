@@ -1,7 +1,8 @@
 INSERT INTO events (slug, name, description, content, online, website, ticket_website, promo, active, country,
                     voivodeship, city, street, apartment, coordinates_latitude, coordinates_longitude, sender_name,
                     sender_email, sender_user_id, created_at, updated_at, deleted_at)
-VALUES ('pajaki-i-skorpiony', 'Pająki i skorpiony', null, null, false, null, null, false, true, 'Poland', 'mazowieckie', 'Warszawa',
+VALUES ('pajaki-i-skorpiony', 'Pająki i skorpiony', null, null, false, null, null, false, true, 'Poland', 'mazowieckie',
+        'Warszawa',
         'plac Defilad', '1', 52.231903682616014, 21.006016455124527, 'John Doe', 'john.doe@example.com', null,
         '2023-05-27 07:55:00', null, null);
 

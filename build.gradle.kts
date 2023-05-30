@@ -59,9 +59,9 @@ dependencyManagement {
 
 tasks.withType<JacocoReport> {
     reports {
-        xml.required.set(true)
+        xml.required.set(false)
         csv.required.set(true)
-        html.required.set(false)
+        html.required.set(true)
     }
 }
 

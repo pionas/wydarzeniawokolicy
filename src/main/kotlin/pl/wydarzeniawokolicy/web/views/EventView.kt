@@ -7,9 +7,7 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.auth.AnonymousAllowed
-import jakarta.annotation.security.PermitAll
 import pl.wydarzeniawokolicy.domain.events.api.Event
-import pl.wydarzeniawokolicy.web.MainLayout
 import java.util.function.Consumer
 
 

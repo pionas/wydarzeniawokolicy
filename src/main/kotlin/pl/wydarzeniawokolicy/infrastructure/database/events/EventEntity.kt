@@ -66,8 +66,10 @@ class SenderEmbeddable(sender: Sender) {
 
     @Column(name = "sender_name")
     var name: String? = null
+
     @Column(name = "sender_email")
     var email: String? = null
+
     @Column(name = "sender_user_id")
     var userId: Long? = null
 

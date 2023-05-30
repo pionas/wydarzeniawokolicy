@@ -29,7 +29,10 @@ class UserRestController(
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable("id") userId: Long, @Valid @RequestBody userDetailsDto: UserDetailsDto): ResponseEntity<UserDto> {
+    fun update(
+        @PathVariable("id") userId: Long,
+        @Valid @RequestBody userDetailsDto: UserDetailsDto
+    ): ResponseEntity<UserDto> {
         val createdUser = userService.update(userId, userMapper.mapToDomain(userDetailsDto))
         return ResponseEntity(userMapper.mapToDto(createdUser), HttpStatus.OK)
     }

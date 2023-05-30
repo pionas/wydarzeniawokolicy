@@ -16,7 +16,7 @@ import pl.wydarzeniawokolicy.domain.shared.NotFoundException
 @ControllerAdvice(basePackageClasses = [RestErrorHandler::class])
 class RestErrorHandler {
 
-    var logger: Logger = LoggerFactory.getLogger(RestErrorHandler::class.java)
+    val logger: Logger = LoggerFactory.getLogger(RestErrorHandler::class.java)
 
     @ExceptionHandler(NotFoundException::class)
     fun exception(exception: NotFoundException): ResponseEntity<String> {

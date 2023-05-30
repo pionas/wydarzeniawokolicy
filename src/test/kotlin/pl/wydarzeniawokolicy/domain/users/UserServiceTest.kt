@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import pl.wydarzeniawokolicy.domain.users.api.*
 import java.time.LocalDateTime
-import java.util.*
 
 class UserServiceTest {
 
