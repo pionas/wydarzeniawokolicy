@@ -10,13 +10,16 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.theme.lumo.LumoUtility
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 import pl.wydarzeniawokolicy.web.security.SecurityService
 import pl.wydarzeniawokolicy.web.views.DashboardView
 import pl.wydarzeniawokolicy.web.views.EventView
 
+@Component
+@Scope("prototype")
 class MainLayout(
-    @Value("\${spring.application.name}") val appName: String,
+    private val appConfiguration: AppConfiguration,
     private val securityService: SecurityService
 ) :
     AppLayout() {
@@ -27,7 +30,7 @@ class MainLayout(
     }
 
     private fun createHeader() {
-        val logo = H1(appName)
+        val logo = H1(appConfiguration.appName)
         logo.addClassNames(
             LumoUtility.FontSize.LARGE,
             LumoUtility.Margin.MEDIUM

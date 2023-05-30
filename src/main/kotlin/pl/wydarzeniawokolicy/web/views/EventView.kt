@@ -7,12 +7,17 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.auth.AnonymousAllowed
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 import pl.wydarzeniawokolicy.domain.events.api.Event
+import pl.wydarzeniawokolicy.web.MainLayout
 import java.util.function.Consumer
 
 
-@Route(value = "")
+@Route(value = "", layout = MainLayout::class)
 @AnonymousAllowed
+@Component
+@Scope("prototype")
 class EventView : HorizontalLayout() {
 
     private var grid: Grid<Event> = Grid(Event::class.java)

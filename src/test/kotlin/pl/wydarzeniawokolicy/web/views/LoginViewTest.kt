@@ -1,25 +1,25 @@
 package pl.wydarzeniawokolicy.web.views
 
-import com.github.mvysny.dynatest.DynaTest
 import com.github.mvysny.kaributesting.v10._get
-import com.github.mvysny.kaributools.navigateTo
 import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.login.LoginForm
-import kotlin.test.expect
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import kotlin.test.assertEquals
 
 
-class LoginViewTest : DynaTest({
+@SpringBootTest
+class LoginViewTest {
 
-    usingApp()
+    @Autowired
+    lateinit var view: LoginView
 
-    beforeEach {
-        navigateTo<LoginView>()
+    @Test
+    fun formShownWhenContactSelected() {
+        val loginForm = view._get<LoginForm>()
+        val header = view._get<H1>()
+        assertEquals("Vaadin CRM", header.text)
+        assertEquals("login", loginForm.action)
     }
-
-    test("show login form") {
-        val loginForm = _get<LoginForm>()
-        val header = _get<H1>()
-        expect("Vaadin CRM") { header.text }
-        expect("login") { loginForm.action }
-    }
-})
+}

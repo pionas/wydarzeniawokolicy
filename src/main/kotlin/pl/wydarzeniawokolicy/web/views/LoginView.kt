@@ -8,9 +8,13 @@ import com.vaadin.flow.router.BeforeEnterEvent
 import com.vaadin.flow.router.BeforeEnterObserver
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 
 @Route("login")
 @PageTitle("Login | Vaadin CRM")
+@Component
+@Scope("prototype")
 class LoginView : VerticalLayout(), BeforeEnterObserver {
 
     private val login = LoginForm()
