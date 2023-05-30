@@ -29,13 +29,13 @@ class UserRestController(
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable("id") userId: Long, @RequestBody user: UserDetailsDto): ResponseEntity<UserDto> {
-        val createdUser = userService.update(userId, userMapper.mapToDomain(user))
+    fun update(@PathVariable("id") userId: Long, @Valid @RequestBody userDetailsDto: UserDetailsDto): ResponseEntity<UserDto> {
+        val createdUser = userService.update(userId, userMapper.mapToDomain(userDetailsDto))
         return ResponseEntity(userMapper.mapToDto(createdUser), HttpStatus.OK)
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") userId: Long): ResponseEntity<Void> {
+    fun delete(@PathVariable("id") userId: Long): ResponseEntity<Unit> {
         userService.deleteById(userId)
         return ResponseEntity(HttpStatus.OK)
     }

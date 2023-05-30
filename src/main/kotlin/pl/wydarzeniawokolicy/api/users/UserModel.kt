@@ -2,10 +2,6 @@ package pl.wydarzeniawokolicy.api.users
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
@@ -24,7 +20,9 @@ data class UserDto(
     val id: Long,
     val name: String,
     val email: String?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class) @JsonSerialize(using = LocalDateTimeSerializer::class) val createdAt: LocalDateTime
+    val createdAt: LocalDateTime?,
+    val updatedAt: LocalDateTime?,
+    val deletedAt: LocalDateTime?
 )
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

@@ -8,14 +8,6 @@ class PasswordConfirmValidatorTest {
     private val passwordConfirmValidator = PasswordConfirmValidator()
 
     @Test
-    fun shouldReturnValidIfUserDetailsDtoIsNull() {
-        //when
-        val valid = passwordConfirmValidator.isValid(null, null)
-        //then
-        Assertions.assertTrue(valid)
-    }
-
-    @Test
     fun shouldReturnValidIfPasswordAndPasswordConfirmIsNull() {
         //when
         val valid = passwordConfirmValidator.isValid(getUserDetailsDto(null, null), null)

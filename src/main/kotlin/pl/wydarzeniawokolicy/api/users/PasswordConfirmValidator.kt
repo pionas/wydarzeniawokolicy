@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext
 
 class PasswordConfirmValidator : ConstraintValidator<PasswordConfirmAnnotation, UserDetailsDto> {
 
-    override fun isValid(userDetailsDto: UserDetailsDto?, context: ConstraintValidatorContext?): Boolean {
-        return userDetailsDto?.password == userDetailsDto?.passwordConfirm
+    override fun isValid(userDetailsDto: UserDetailsDto, context: ConstraintValidatorContext?): Boolean {
+        return userDetailsDto.password == userDetailsDto.passwordConfirm
     }
 }
