@@ -267,6 +267,42 @@ class CategoryServiceTest {
     }
 
     @Test
+    fun shouldUpdateCategoryWithTheSameSlug() {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 25, 18, 57, 0, 0)
+        val currentSlug = "category-slug"
+        val categoryToUpdate = NewCategory("Category After Update", currentSlug)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
+        whenever(repository.existsBySlug(any())).thenReturn(true, true, false)
+        whenever(stringUtils.slug(any())).thenReturn("category-after-update")
+        whenever(repository.findBySlug(currentSlug)).thenReturn(
+            getCategory(
+                "category 1",
+                currentSlug,
+                localDateTime,
+                localDateTime
+            ),
+            getCategory(
+                "category 1",
+                currentSlug,
+                localDateTime,
+                localDateTime
+            )
+        )
+        // when
+        service.update(currentSlug, categoryToUpdate)
+        //then
+        val argumentCaptor = argumentCaptor<Category>()
+        verify(repository, times(1)).create(argumentCaptor.capture())
+        verify(repository, times(2)).findBySlug(any())
+        Assertions.assertThat(argumentCaptor.firstValue)
+            .hasFieldOrPropertyWithValue("name", "Category After Update")
+            .hasFieldOrPropertyWithValue("slug", "category-slug")
+            .hasFieldOrPropertyWithValue("createdAt", localDateTime)
+            .hasFieldOrPropertyWithValue("updatedAt", localDateTime.plusDays(1))
+    }
+
+    @Test
     fun shouldReturnUserById() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 25, 18, 57, 0, 0)

@@ -2,12 +2,12 @@ package pl.wydarzeniawokolicy.domain.shared
 
 class SlugHelper {
     companion object {
-        fun generateSlug(categoryRepository: SlugRepository, slug: String): String {
+        fun generateSlug(repository: SlugRepository, slug: String): String {
             var i = 0
             var newSlug: String?
             do {
                 newSlug = getSlug(slug, i)
-                val exists = categoryRepository.existsBySlug(newSlug)
+                val exists = repository.existsBySlug(newSlug)
                 i++
             } while (exists)
             return newSlug!!

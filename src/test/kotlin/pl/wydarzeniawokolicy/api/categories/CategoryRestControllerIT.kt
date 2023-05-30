@@ -94,11 +94,12 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql("/db/categories.sql")
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
-        val categoryDto = NewCategoryDto("Category 1", "category-1")
+        val categoryDto = NewCategoryDto("Category 1", null)
         // when
         val category = restTemplate.postForEntity("/categories", categoryDto, CategoryDto::class.java)
         // then
@@ -106,7 +107,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         assertEquals(HttpStatus.CREATED, category?.statusCode)
         Assertions.assertThat(category.body)
             .hasFieldOrPropertyWithValue("name", categoryDto.name)
-            .hasFieldOrPropertyWithValue("slug", categoryDto.slug)
+            .hasFieldOrPropertyWithValue("slug", "category-11")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
 
