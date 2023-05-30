@@ -96,6 +96,7 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)

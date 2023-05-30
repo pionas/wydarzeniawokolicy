@@ -104,6 +104,7 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql("/db/files.sql")
     fun shouldCreate() {
         // given
         val request = getMultipartFile("files/forest-1000x1000.jpg")

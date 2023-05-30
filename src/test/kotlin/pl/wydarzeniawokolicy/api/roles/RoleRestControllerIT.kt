@@ -94,11 +94,12 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql("/db/roles.sql")
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
-        val roleDto = NewRoleDto("Role 1", "role-1")
+        val roleDto = NewRoleDto("Role 1", null)
         // when
         val role = restTemplate.postForEntity("/roles", roleDto, RoleDto::class.java)
         // then
@@ -106,7 +107,7 @@ internal class RoleRestControllerIT : BasicIT() {
         assertEquals(HttpStatus.CREATED, role?.statusCode)
         Assertions.assertThat(role.body)
             .hasFieldOrPropertyWithValue("name", roleDto.name)
-            .hasFieldOrPropertyWithValue("slug", roleDto.slug)
+            .hasFieldOrPropertyWithValue("slug", "role-11")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
 
