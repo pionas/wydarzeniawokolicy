@@ -9,6 +9,9 @@ import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Profile
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.stereotype.Component
+import pl.wydarzeniawokolicy.domain.events.api.EventService
+import pl.wydarzeniawokolicy.domain.events.api.NewEvent
+import pl.wydarzeniawokolicy.domain.events.api.Sender
 import pl.wydarzeniawokolicy.domain.users.api.UserService
 import pl.wydarzeniawokolicy.domain.users.api.UserSignUp
 
@@ -27,10 +30,13 @@ fun main(args: Array<String>) {
 
 @Component
 @Profile("!it")
-class Initializer(val userService: UserService) : ApplicationListener<ContextRefreshedEvent> {
+class Initializer(val userService: UserService, val eventService: EventService) : ApplicationListener<ContextRefreshedEvent> {
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         if (userService.findAll().isEmpty()) {
             userService.create(UserSignUp("john.doe", "john.doe@example.com", "validPassword", "validPassword"))
+        }
+        if (eventService.findAll().isEmpty()) {
+            eventService.create(NewEvent(name = "Custom Event", sender = Sender("John Doe", "john.doe@example.com", null)))
         }
     }
 }

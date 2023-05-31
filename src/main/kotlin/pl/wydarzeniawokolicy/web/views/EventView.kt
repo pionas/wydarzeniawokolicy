@@ -14,7 +14,7 @@ import pl.wydarzeniawokolicy.web.MainLayout
 import java.util.function.Consumer
 
 
-@Route(value = "", layout = MainLayout::class)
+@Route(value = "events", layout = MainLayout::class)
 @AnonymousAllowed
 @Component
 @Scope("prototype")
