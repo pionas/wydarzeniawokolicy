@@ -3,6 +3,8 @@ package pl.wydarzeniawokolicy.api.categories
 import org.mapstruct.Mapper
 import pl.wydarzeniawokolicy.domain.categories.api.Category
 import pl.wydarzeniawokolicy.domain.categories.api.NewCategory
+import pl.wydarzeniawokolicy.shared.CategoryDto
+import pl.wydarzeniawokolicy.shared.NewCategoryDto
 
 @Mapper(componentModel = "spring")
 interface CategoryMapper {

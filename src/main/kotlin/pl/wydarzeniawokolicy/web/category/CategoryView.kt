@@ -61,7 +61,6 @@ class CategoryView(private val service: CategoryService, private val appProperti
             }
             button.text = "Edit"
         })
-
         setItems()
     }
 

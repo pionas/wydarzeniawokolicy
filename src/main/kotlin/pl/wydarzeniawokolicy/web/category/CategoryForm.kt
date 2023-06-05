@@ -7,30 +7,26 @@ import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
-import com.vaadin.flow.data.binder.Binder
-import com.vaadin.flow.data.converter.StringToIntegerConverter
-import com.vaadin.flow.function.SerializablePredicate
-import jakarta.validation.constraints.NotEmpty
-import jakarta.validation.constraints.Size
+import com.vaadin.flow.data.binder.BinderValidationStatus
 import pl.wydarzeniawokolicy.domain.categories.api.Category
+import pl.wydarzeniawokolicy.shared.NewCategoryDto
 
 
 class CategoryForm(category: Category?, categoryFormAction: CategoryFormAction) : FormLayout() {
 
-    @NotEmpty
-    @Size(min = 3, max = 100)
     var name = TextField("Name")
-
-    @Size(min = 3, max = 103)
     var slug = TextField("Slug")
 
-
-//    var binder: Binder<Category> = Binder(Category::class.java)
-    private val binder: BeanValidationBinder<Category> = BeanValidationBinder(Category::class.java)
+    private val binder: BeanValidationBinder<NewCategoryDto> = BeanValidationBinder(NewCategoryDto::class.java)
 
     private var save = Button("Save") {
-        if (binder.validate().isOk) {
-            categoryFormAction.save(name.value, slug.value)
+        val status: BinderValidationStatus<NewCategoryDto> = binder.validate()
+        if (status.isOk) {
+            val newCategoryDto = NewCategoryDto()
+            binder.writeBeanIfValid(newCategoryDto)
+            categoryFormAction.save(newCategoryDto.name!!, newCategoryDto.slug)
+        } else {
+
         }
     }
 
@@ -64,9 +60,11 @@ class CategoryForm(category: Category?, categoryFormAction: CategoryFormAction) 
     }
 
     private fun bindToBean() {
-//        binder.bind(name, "name")
-//        binder.bind(slug, "slug")
-        binder.bindInstanceFields(this)
+        binder.forField(name)
+            .bind("name")
+        binder.forField(slug)
+            .withNullRepresentation("")
+            .bind("slug")
     }
 
 }

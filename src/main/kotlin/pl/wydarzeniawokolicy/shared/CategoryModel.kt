@@ -1,7 +1,8 @@
-package pl.wydarzeniawokolicy.api.categories
+package pl.wydarzeniawokolicy.shared
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.Null
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
@@ -16,6 +17,6 @@ data class CategoryDto(
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class NewCategoryDto(
-    @field:NotEmpty @field:Size(min = 3, max = 100) val name: String?,
-    @field:Size(min = 3, max = 103) val slug: String?,
+    @field:NotEmpty @field:Size(min = 3, max = 100) var name: String? = null,
+    @field:Size(min = 3, max = 103) var slug: String? = null,
 )

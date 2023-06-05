@@ -17,6 +17,8 @@ import org.springframework.test.context.jdbc.Sql
 import org.springframework.web.client.HttpClientErrorException
 import pl.wydarzeniawokolicy.api.BasicIT
 import pl.wydarzeniawokolicy.infrastructure.database.categories.CategoryEntity
+import pl.wydarzeniawokolicy.shared.CategoryDto
+import pl.wydarzeniawokolicy.shared.NewCategoryDto
 import java.time.LocalDateTime
 import java.util.stream.Stream
 
