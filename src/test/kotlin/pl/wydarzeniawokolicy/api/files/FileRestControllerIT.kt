@@ -45,7 +45,7 @@ internal class FileRestControllerIT : BasicIT() {
         // given
 
         // when
-        val result = restTemplate.getForEntity("/files", List::class.java)
+        val result = restApiTemplate.getForEntity("/files", List::class.java)
 
         // then
         assertNotNull(result)
@@ -57,7 +57,7 @@ internal class FileRestControllerIT : BasicIT() {
     fun shouldReturnFileList() {
         // given
         // when
-        val result: ResponseEntity<List<FileDto>> = restTemplate.exchange(
+        val result: ResponseEntity<List<FileDto>> = restApiTemplate.exchange(
             "/files",
             HttpMethod.GET,
             null,
@@ -95,7 +95,7 @@ internal class FileRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/files", LinkedMultiValueMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.postForEntity("/files", LinkedMultiValueMap<String, Any>(), Any::class.java) },
                 HttpServerErrorException::class.java
             )
         // then
@@ -109,7 +109,7 @@ internal class FileRestControllerIT : BasicIT() {
         // given
         val request = getMultipartFile("files/forest-1000x1000.jpg")
         // when
-        val file = restTemplate.postForEntity("/files", request, FileDto::class.java)
+        val file = restApiTemplate.postForEntity("/files", request, FileDto::class.java)
         // then
         assertNotNull(file)
         assertEquals(HttpStatus.CREATED, file?.statusCode)
@@ -124,7 +124,7 @@ internal class FileRestControllerIT : BasicIT() {
     fun shouldReturnFileDetailsByHash() {
         // given
         // when
-        val result = restTemplate.getForEntity("/files/hash1", FileDto::class.java)
+        val result = restApiTemplate.getForEntity("/files/hash1", FileDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -141,7 +141,7 @@ internal class FileRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.getForEntity("/files/invalidhash", Object::class.java) },
+                { restApiTemplate.getForEntity("/files/invalidhash", Object::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -156,7 +156,7 @@ internal class FileRestControllerIT : BasicIT() {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val fileToUpload = getMultipartFile("files/mac-1000x1000.jpg")
         // when
-        val file = restTemplate.postForEntity("/files", fileToUpload, FileDto::class.java)
+        val file = restApiTemplate.postForEntity("/files", fileToUpload, FileDto::class.java)
         // then
         assertNotNull(file)
         assertEquals(HttpStatus.CREATED, file?.statusCode)
@@ -171,7 +171,7 @@ internal class FileRestControllerIT : BasicIT() {
     fun shouldDelete() {
         // given
         // when
-        val result = restTemplate.exchange("/files/hash1", HttpMethod.DELETE, null, Any::class.java)
+        val result = restApiTemplate.exchange("/files/hash1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val fileEntity = dbUtils.em().find(FileEntity::class.java, "hash1")

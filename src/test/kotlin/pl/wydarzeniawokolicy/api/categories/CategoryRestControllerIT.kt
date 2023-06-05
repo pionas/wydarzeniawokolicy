@@ -30,7 +30,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // given
 
         // when
-        val result = restTemplate.getForEntity("/categories", List::class.java)
+        val result = restApiTemplate.getForEntity("/categories", List::class.java)
 
         // then
         assertNotNull(result)
@@ -42,7 +42,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     fun shouldReturnCategoryList() {
         // given
         // when
-        val result: ResponseEntity<List<CategoryDto>> = restTemplate.exchange(
+        val result: ResponseEntity<List<CategoryDto>> = restApiTemplate.exchange(
             "/categories",
             HttpMethod.GET,
             null,
@@ -72,7 +72,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/categories", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.postForEntity("/categories", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -87,7 +87,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
+                { restApiTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -103,7 +103,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val categoryDto = NewCategoryDto("Category 1", null)
         // when
-        val category = restTemplate.postForEntity("/categories", categoryDto, CategoryDto::class.java)
+        val category = restApiTemplate.postForEntity("/categories", categoryDto, CategoryDto::class.java)
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.CREATED, category?.statusCode)
@@ -118,7 +118,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     fun shouldReturnCategoryDetailsById() {
         // given
         // when
-        val result = restTemplate.getForEntity("/categories/category-2", CategoryDto::class.java)
+        val result = restApiTemplate.getForEntity("/categories/category-2", CategoryDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -135,7 +135,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.getForEntity("/categories/100", Object::class.java) },
+                { restApiTemplate.getForEntity("/categories/100", Object::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -149,7 +149,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/categories/category-1", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.put("/categories/category-1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -168,7 +168,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/categories/category-1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -194,7 +194,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/categories/category-1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -216,7 +216,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/categories/category-1", categoryDto, Any::class.java) },
+                { restApiTemplate.put("/categories/category-1", categoryDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -236,7 +236,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(categoryDto)
         val category: ResponseEntity<CategoryDto> =
-            restTemplate.exchange("/categories/category-1", HttpMethod.PUT, requestEntity, CategoryDto::class.java)
+            restApiTemplate.exchange("/categories/category-1", HttpMethod.PUT, requestEntity, CategoryDto::class.java)
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.OK, category.statusCode)
@@ -252,7 +252,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     fun shouldDelete() {
         // given
         // when
-        val result = restTemplate.exchange("/categories/category-1", HttpMethod.DELETE, null, Any::class.java)
+        val result = restApiTemplate.exchange("/categories/category-1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val categoryEntity = dbUtils.em().find(CategoryEntity::class.java, "category-1")

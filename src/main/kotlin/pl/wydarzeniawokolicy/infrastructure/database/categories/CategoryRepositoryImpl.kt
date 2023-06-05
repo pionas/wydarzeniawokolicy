@@ -40,8 +40,8 @@ class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRe
             currentSlug
         )
         return Category(
-            category.slug,
             category.name,
+            category.slug,
             category.createdAt,
             category.updatedAt,
             category.deletedAt

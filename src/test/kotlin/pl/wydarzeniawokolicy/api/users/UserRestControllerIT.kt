@@ -28,7 +28,7 @@ internal class UserRestControllerIT : BasicIT() {
         // given
 
         // when
-        val result = restTemplate.getForEntity("/users", List::class.java)
+        val result = restApiTemplate.getForEntity("/users", List::class.java)
 
         // then
         assertNotNull(result)
@@ -40,7 +40,7 @@ internal class UserRestControllerIT : BasicIT() {
     fun shouldReturnUserList() {
         // given
         // when
-        val result: ResponseEntity<List<UserDto>> = restTemplate.exchange(
+        val result: ResponseEntity<List<UserDto>> = restApiTemplate.exchange(
             "/users",
             HttpMethod.GET,
             null,
@@ -73,7 +73,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/users", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.postForEntity("/users", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -88,7 +88,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/users", signUpDto, Any::class.java) },
+                { restApiTemplate.postForEntity("/users", signUpDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -104,7 +104,7 @@ internal class UserRestControllerIT : BasicIT() {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val signUpDto = SignUpDto("name", "email@example.com", "password", "password")
         // when
-        val user = restTemplate.postForEntity("/users", signUpDto, UserDto::class.java)
+        val user = restApiTemplate.postForEntity("/users", signUpDto, UserDto::class.java)
         // then
         assertNotNull(user)
         assertEquals(HttpStatus.CREATED, user?.statusCode)
@@ -120,7 +120,7 @@ internal class UserRestControllerIT : BasicIT() {
     fun shouldReturnUserDetailsById() {
         // given
         // when
-        val result = restTemplate.getForEntity("/users/1", UserDto::class.java)
+        val result = restApiTemplate.getForEntity("/users/1", UserDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -137,7 +137,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.getForEntity("/users/100", Object::class.java) },
+                { restApiTemplate.getForEntity("/users/100", Object::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -151,7 +151,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/users/1", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.put("/users/1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -170,7 +170,7 @@ internal class UserRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/users/1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -196,7 +196,7 @@ internal class UserRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/users/1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -222,7 +222,7 @@ internal class UserRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/users/1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -258,7 +258,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/users/1", userDetailsDto, Any::class.java) },
+                { restApiTemplate.put("/users/1", userDetailsDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -290,7 +290,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(userDetailsDto)
         val category: ResponseEntity<UserDto> =
-            restTemplate.exchange("/users/1", HttpMethod.PUT, requestEntity, UserDto::class.java)
+            restApiTemplate.exchange("/users/1", HttpMethod.PUT, requestEntity, UserDto::class.java)
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.OK, category.statusCode)
@@ -306,7 +306,7 @@ internal class UserRestControllerIT : BasicIT() {
     fun shouldDelete() {
         // given
         // when
-        val result = restTemplate.exchange("/users/1", HttpMethod.DELETE, null, Any::class.java)
+        val result = restApiTemplate.exchange("/users/1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
     }

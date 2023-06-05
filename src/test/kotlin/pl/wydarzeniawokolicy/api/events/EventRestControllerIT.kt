@@ -30,7 +30,7 @@ internal class EventRestControllerIT : BasicIT() {
         // given
 
         // when
-        val result = restTemplate.getForEntity("/events", List::class.java)
+        val result = restApiTemplate.getForEntity("/events", List::class.java)
 
         // then
         assertNotNull(result)
@@ -42,7 +42,7 @@ internal class EventRestControllerIT : BasicIT() {
     fun shouldReturnEventList() {
         // given
         // when
-        val result: ResponseEntity<List<EventDto>> = restTemplate.exchange(
+        val result: ResponseEntity<List<EventDto>> = restApiTemplate.exchange(
             "/events",
             HttpMethod.GET,
             null,
@@ -72,7 +72,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/events", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.postForEntity("/events", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -87,7 +87,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/events", eventDto, Any::class.java) },
+                { restApiTemplate.postForEntity("/events", eventDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -103,7 +103,7 @@ internal class EventRestControllerIT : BasicIT() {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val eventDto = NewEventDto("Event 1", "event-1")
         // when
-        val event = restTemplate.postForEntity("/events", eventDto, EventDto::class.java)
+        val event = restApiTemplate.postForEntity("/events", eventDto, EventDto::class.java)
         // then
         assertNotNull(event)
         assertEquals(HttpStatus.CREATED, event?.statusCode)
@@ -118,7 +118,7 @@ internal class EventRestControllerIT : BasicIT() {
     fun shouldReturnEventDetailsById() {
         // given
         // when
-        val result = restTemplate.getForEntity("/events/kopernik-i-jego-swiat", EventDto::class.java)
+        val result = restApiTemplate.getForEntity("/events/kopernik-i-jego-swiat", EventDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -135,7 +135,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.getForEntity("/events/100", Object::class.java) },
+                { restApiTemplate.getForEntity("/events/100", Object::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -149,7 +149,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/events/event-1", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.put("/events/event-1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -168,7 +168,7 @@ internal class EventRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/events/event-not-exist",
                         HttpMethod.PUT,
                         requestEntity,
@@ -194,7 +194,7 @@ internal class EventRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restTemplate.exchange(
+                    restApiTemplate.exchange(
                         "/events/pajaki-i-skorpiony",
                         HttpMethod.PUT,
                         requestEntity,
@@ -216,7 +216,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/events/pajaki-i-skorpiony", eventDto, Any::class.java) },
+                { restApiTemplate.put("/events/pajaki-i-skorpiony", eventDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -236,7 +236,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(eventDto)
         val event: ResponseEntity<EventDto> =
-            restTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.PUT, requestEntity, EventDto::class.java)
+            restApiTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.PUT, requestEntity, EventDto::class.java)
         // then
         assertNotNull(event)
         assertEquals(HttpStatus.OK, event.statusCode)
@@ -252,7 +252,7 @@ internal class EventRestControllerIT : BasicIT() {
     fun shouldDelete() {
         // given
         // when
-        val result = restTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.DELETE, null, Any::class.java)
+        val result = restApiTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val entity = dbUtils.em().find(EventEntity::class.java, "pajaki-i-skorpiony")

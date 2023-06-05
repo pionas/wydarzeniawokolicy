@@ -28,7 +28,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // given
 
         // when
-        val result = restTemplate.getForEntity("/roles", List::class.java)
+        val result = restApiTemplate.getForEntity("/roles", List::class.java)
 
         // then
         assertNotNull(result)
@@ -40,7 +40,7 @@ internal class RoleRestControllerIT : BasicIT() {
     fun shouldReturnRoleList() {
         // given
         // when
-        val result: ResponseEntity<List<RoleDto>> = restTemplate.exchange(
+        val result: ResponseEntity<List<RoleDto>> = restApiTemplate.exchange(
             "/roles",
             HttpMethod.GET,
             null,
@@ -70,7 +70,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/roles", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.postForEntity("/roles", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -85,7 +85,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.postForEntity("/roles", roleDto, Any::class.java) },
+                { restApiTemplate.postForEntity("/roles", roleDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -101,7 +101,7 @@ internal class RoleRestControllerIT : BasicIT() {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val roleDto = NewRoleDto("Role 1", null)
         // when
-        val role = restTemplate.postForEntity("/roles", roleDto, RoleDto::class.java)
+        val role = restApiTemplate.postForEntity("/roles", roleDto, RoleDto::class.java)
         // then
         assertNotNull(role)
         assertEquals(HttpStatus.CREATED, role?.statusCode)
@@ -116,7 +116,7 @@ internal class RoleRestControllerIT : BasicIT() {
     fun shouldReturnRoleDetailsById() {
         // given
         // when
-        val result = restTemplate.getForEntity("/roles/role-2", RoleDto::class.java)
+        val result = restApiTemplate.getForEntity("/roles/role-2", RoleDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -133,7 +133,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.getForEntity("/roles/100", Object::class.java) },
+                { restApiTemplate.getForEntity("/roles/100", Object::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -147,7 +147,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/roles/role-1", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.put("/roles/role-1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -165,7 +165,7 @@ internal class RoleRestControllerIT : BasicIT() {
         val requestEntity = HttpEntity(roleDto)
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java) },
+                { restApiTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -184,7 +184,7 @@ internal class RoleRestControllerIT : BasicIT() {
         val requestEntity = HttpEntity(roleDto)
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java) },
+                { restApiTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -200,7 +200,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restTemplate.put("/roles/role-1", roleDto, Any::class.java) },
+                { restApiTemplate.put("/roles/role-1", roleDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -220,7 +220,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(roleDto)
         val role: ResponseEntity<RoleDto> =
-            restTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java)
+            restApiTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java)
         // then
         assertNotNull(role)
         assertEquals(HttpStatus.OK, role.statusCode)
@@ -236,7 +236,7 @@ internal class RoleRestControllerIT : BasicIT() {
     fun shouldDelete() {
         // given
         // when
-        val result = restTemplate.exchange("/roles/role-1", HttpMethod.DELETE, null, Any::class.java)
+        val result = restApiTemplate.exchange("/roles/role-1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val roleEntity = dbUtils.em().find(RoleEntity::class.java, "role-1")

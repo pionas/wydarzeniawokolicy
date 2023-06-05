@@ -11,11 +11,17 @@ import org.springframework.web.client.DefaultResponseErrorHandler
 @TestConfiguration
 class RestITConfig {
 
-    private val ROOT_URI = "http://localhost:7778/api/v1"
+    private val ROOT_URI = "http://localhost:7778/"
+    private val ROOT_API_URI = ROOT_URI.plus("/api/v1")
 
     @Bean
-    fun testRestTemplate(): TestRestTemplate {
-        return buildRestTemplate(null, null)
+    fun restApiTemplate(): TestRestTemplate {
+        return buildRestTemplate(null, null, ROOT_API_URI)
+    }
+
+    @Bean
+    fun restTemplate(): TestRestTemplate {
+        return buildRestTemplate(null, null, ROOT_URI)
     }
 
     @Bean
@@ -23,7 +29,7 @@ class RestITConfig {
         @Value("\${users.valid.username}") username: String,
         @Value("\${users.valid.password}") password: String
     ): TestRestTemplate {
-        return buildRestTemplate(username, password)
+        return buildRestTemplate(username, password, ROOT_API_URI)
     }
 
     @Bean
@@ -31,20 +37,21 @@ class RestITConfig {
         @Value("\${users.invalid.username}") username: String,
         @Value("\${users.invalid.password}") password: String
     ): TestRestTemplate {
-        return buildRestTemplate(username, password)
+        return buildRestTemplate(username, password, ROOT_API_URI)
     }
 
     @Bean
     fun wrongPasswordRestTemplate(@Value("\${users.valid.username}") username: String): TestRestTemplate {
-        return buildRestTemplate(username, username)
+        return buildRestTemplate(username, username, ROOT_API_URI)
     }
 
     private fun buildRestTemplate(
         username: String?,
-        password: String?
+        password: String?,
+        rootUri: String
     ): TestRestTemplate {
         val restTemplateBuilder = RestTemplateBuilder()
-            .rootUri(ROOT_URI)
+            .rootUri(rootUri)
         val testRestTemplate = TestRestTemplate(restTemplateBuilder)
         testRestTemplate.restTemplate.errorHandler = DefaultResponseErrorHandler()
         if (listOfNotNull(username, password).size == 2) {

@@ -20,7 +20,11 @@ import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
 @Import(RestITConfig::class, MockITConfig::class, DbItConfig::class)
 class BasicIT {
 
-    @Qualifier("testRestTemplate")
+    @Qualifier("restApiTemplate")
+    @Autowired
+    lateinit var restApiTemplate: TestRestTemplate
+
+    @Qualifier("restTemplate")
     @Autowired
     lateinit var restTemplate: TestRestTemplate
 
