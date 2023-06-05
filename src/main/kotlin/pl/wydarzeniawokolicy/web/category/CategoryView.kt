@@ -14,6 +14,7 @@ import com.vaadin.flow.data.selection.SelectionEvent
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.HasDynamicTitle
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.router.RouteParameters
 import com.vaadin.flow.server.auth.AnonymousAllowed
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -60,6 +61,17 @@ class CategoryView(private val service: CategoryService, private val appProperti
                 showDialog(category)
             }
             button.text = "Edit"
+        })
+        grid.addColumn(ComponentRenderer({ Button() }) { button: Button, category: Category ->
+            button.addClickListener { _: ClickEvent<Button> ->
+                button.ui.ifPresent {
+                    it.navigate(
+                        CategoryDetailsView::class.java,
+                        RouteParameters("slug", category.slug)
+                    )
+                }
+            }
+            button.text = "Show"
         })
         setItems()
     }
