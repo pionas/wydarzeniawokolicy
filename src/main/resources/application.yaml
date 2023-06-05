@@ -25,3 +25,6 @@ flyway:
 vaadin:
   whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,pl.wydarzeniawokolicy
   exclude-urls: /api/**
+
+category:
+  title: Categories

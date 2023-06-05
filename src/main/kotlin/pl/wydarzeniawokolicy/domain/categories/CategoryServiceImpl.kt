@@ -1,6 +1,7 @@
 package pl.wydarzeniawokolicy.domain.categories
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import pl.wydarzeniawokolicy.domain.categories.api.Category
 import pl.wydarzeniawokolicy.domain.categories.api.CategoryException
 import pl.wydarzeniawokolicy.domain.categories.api.CategoryService
@@ -34,11 +35,12 @@ class CategoryServiceImpl(
         categoryRepository.delete(slug)
     }
 
+    @Transactional
     override fun update(currentSlug: String, newCategory: NewCategory): Category {
         val category = categoryRepository.findBySlug(currentSlug) ?: throw CategoryException.slugNotFound(currentSlug)
         verifySlug(category.slug, newCategory.slug)
         category.update(newCategory.name, getSlug(newCategory), dateTimeUtils.getLocalDateTimeNow())
-        return categoryRepository.create(category)
+        return categoryRepository.update(currentSlug, category)
     }
 
     override fun findBySlug(slug: String): Category {

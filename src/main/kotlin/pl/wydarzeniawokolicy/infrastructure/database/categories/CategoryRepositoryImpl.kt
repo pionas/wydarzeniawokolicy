@@ -3,6 +3,7 @@ package pl.wydarzeniawokolicy.infrastructure.database.categories
 import org.springframework.stereotype.Repository
 import pl.wydarzeniawokolicy.domain.categories.CategoryRepository
 import pl.wydarzeniawokolicy.domain.categories.api.Category
+import pl.wydarzeniawokolicy.domain.categories.api.CategoryException
 
 @Repository
 class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRepository {
@@ -27,6 +28,24 @@ class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRe
             deletedAt = category.deletedAt
         )
         return Category(repository.save(categoryEntity))
+    }
+
+    override fun update(currentSlug: String, category: Category): Category {
+        repository.update(
+            category.slug,
+            category.name,
+            category.createdAt,
+            category.updatedAt,
+            category.deletedAt,
+            currentSlug
+        )
+        return Category(
+            category.slug,
+            category.name,
+            category.createdAt,
+            category.updatedAt,
+            category.deletedAt
+        )
     }
 
     override fun existsBySlug(slug: String): Boolean {

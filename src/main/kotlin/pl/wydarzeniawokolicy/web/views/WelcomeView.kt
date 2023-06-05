@@ -58,6 +58,6 @@ class WelcomeView(eventService: EventService) : Div() {
         val list: VirtualList<Event> = VirtualList<Event>()
         list.setItems(events)
         list.setRenderer(eventCardRenderer)
-        add(list)
+        add(Div(Text("TODO: Implements map")), list)
     }
 }

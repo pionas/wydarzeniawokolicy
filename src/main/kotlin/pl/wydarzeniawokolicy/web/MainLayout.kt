@@ -14,18 +14,16 @@ import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.theme.lumo.LumoUtility
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
+import pl.wydarzeniawokolicy.web.category.CategoryView
 import pl.wydarzeniawokolicy.web.security.SecurityService
-import pl.wydarzeniawokolicy.web.views.DashboardView
-import pl.wydarzeniawokolicy.web.views.EventView
-import pl.wydarzeniawokolicy.web.views.LoginView
-import pl.wydarzeniawokolicy.web.views.WelcomeView
+import pl.wydarzeniawokolicy.web.views.*
 import com.vaadin.flow.component.Component as VaadinComponent
 
 
 @Component
 @Scope("prototype")
 class MainLayout(
-    private val appConfiguration: AppConfiguration,
+    private val appProperties: AppProperties,
     private val securityService: SecurityService
 ) :
     AppLayout() {
@@ -36,7 +34,7 @@ class MainLayout(
     }
 
     private fun createHeader() {
-        val logo = H1(appConfiguration.appName)
+        val logo = H1(appProperties.appName)
         logo.addClassNames(
             LumoUtility.FontSize.LARGE,
             LumoUtility.Margin.MEDIUM
@@ -58,11 +56,13 @@ class MainLayout(
             VerticalLayout(
                 createRouterLink(VaadinIcon.HOME, "Welcome", WelcomeView::class.java),
                 createRouterLink(VaadinIcon.DASHBOARD, "Dashboard", DashboardView::class.java),
+                createRouterLink(VaadinIcon.LINES_LIST, "Categories", CategoryView::class.java),
                 createRouterLink(VaadinIcon.CALENDAR_USER, "Events", EventView::class.java),
+                // createRouterLink(VaadinIcon.USERS, "Users", UserView::class.java),
+                // createRouterLink(VaadinIcon.USER, "Profile", ProfileView::class.java),
                 getUserLink(),
             )
         )
-        isDrawerOpened = false
     }
 
     private fun createRouterLink(

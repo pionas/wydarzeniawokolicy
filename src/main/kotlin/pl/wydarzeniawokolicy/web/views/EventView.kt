@@ -3,6 +3,7 @@ package pl.wydarzeniawokolicy.web.views
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
+import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.Route
@@ -13,25 +14,24 @@ import pl.wydarzeniawokolicy.domain.events.api.Event
 import pl.wydarzeniawokolicy.web.MainLayout
 import java.util.function.Consumer
 
-
 @Route(value = "events", layout = MainLayout::class)
 @AnonymousAllowed
 @Component
 @Scope("prototype")
-class EventView : HorizontalLayout() {
+class EventView : VerticalLayout() {
 
     private var grid: Grid<Event> = Grid(Event::class.java)
     private var filterText = TextField()
 
     init {
-        addClassName("list-view")
+        addClassName("event-list-view")
         setSizeFull()
         configureGrid()
         add(getToolbar(), grid)
     }
 
     private fun configureGrid() {
-        grid.addClassNames("contact-grid")
+        grid.addClassNames("events-grid")
         grid.setSizeFull()
         grid.setColumns("name", "description", "online", "createdAt")
 //        grid.addColumn(ValueProvider<Event, Any> { event: Event ->

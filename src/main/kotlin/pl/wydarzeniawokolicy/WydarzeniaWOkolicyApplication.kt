@@ -4,6 +4,7 @@ import com.vaadin.flow.component.page.AppShellConfigurator
 import com.vaadin.flow.server.PWA
 import com.vaadin.flow.theme.Theme
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Profile
@@ -22,6 +23,7 @@ import pl.wydarzeniawokolicy.domain.users.api.UserSignUp
     shortName = "WWO",
     iconPath = "img/icons/logo.png"
 )
+@ConfigurationPropertiesScan
 class WydarzeniaWOkolicyApplication : AppShellConfigurator
 
 fun main(args: Array<String>) {

@@ -1,4 +1,4 @@
-package pl.wydarzeniawokolicy.infrastructure
+package pl.wydarzeniawokolicy.api
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -35,7 +35,8 @@ class SecurityConfig {
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.httpBasic().and()
+        http.httpBasic()
+            .and()
             .anonymous()
             .and()
             .authorizeHttpRequests()

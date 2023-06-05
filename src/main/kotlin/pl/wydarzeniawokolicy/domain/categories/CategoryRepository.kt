@@ -8,6 +8,7 @@ interface CategoryRepository : SlugRepository {
     fun findAll(): List<Category>
     fun findBySlug(slug: String): Category?
     fun create(category: Category): Category
+    fun update(currentSlug: String, category: Category): Category
     fun delete(slug: String)
 
 }
