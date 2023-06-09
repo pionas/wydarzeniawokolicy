@@ -1,9 +1,9 @@
 package pl.wydarzeniawokolicy.web.category
 
-import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -69,23 +69,24 @@ class CategoryView(
             category.updatedAt?.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
         }).setHeader(Category.UPDATED_AT)
 
-        grid.addColumn(ComponentRenderer({ Button() }) { button: Button, category: Category ->
-            button.addClickListener { _: ClickEvent<Button> ->
-                showDialog(category)
+        grid.addColumn(ComponentRenderer({ Div() }) { div: Div, category: Category ->
+            val buttonEdit = Button("Edit") {
+                addClickListener {
+                    showDialog(category)
+                }
             }
-            button.text = "Edit"
-        })
-        grid.addColumn(ComponentRenderer({ Button() }) { button: Button, category: Category ->
-            button.addClickListener { _: ClickEvent<Button> ->
-                button.ui.ifPresent {
+            val buttonShow = Button("Show") {
+                ui.ifPresent {
                     it.navigate(
                         CategoryDetailsView::class.java,
                         RouteParameters("slug", category.slug)
                     )
                 }
             }
-            button.text = "Show"
-        })
+            div.add(buttonEdit, buttonShow)
+        }).setHeader("Actions")
+            .setKey("actions")
+
         grid.columns.forEach { it.setAutoWidth(true) }
         grid.setItems(filterDataProvider)
     }

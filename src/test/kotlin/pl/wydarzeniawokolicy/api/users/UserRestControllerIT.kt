@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.web.client.HttpClientErrorException
-import pl.wydarzeniawokolicy.api.BasicIT
+import pl.wydarzeniawokolicy.BasicIT
 import java.time.LocalDateTime
 import java.util.stream.Stream
 

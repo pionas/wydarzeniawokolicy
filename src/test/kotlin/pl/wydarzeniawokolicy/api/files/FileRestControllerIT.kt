@@ -15,7 +15,7 @@ import org.springframework.util.FileSystemUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
-import pl.wydarzeniawokolicy.api.BasicIT
+import pl.wydarzeniawokolicy.BasicIT
 import pl.wydarzeniawokolicy.infrastructure.database.files.FileEntity
 import java.nio.file.Paths
 import java.time.LocalDate

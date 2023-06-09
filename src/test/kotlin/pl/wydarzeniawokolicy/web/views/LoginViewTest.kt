@@ -5,20 +5,19 @@ import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.login.LoginForm
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import pl.wydarzeniawokolicy.BasicIT
 import kotlin.test.assertEquals
 
 
-@SpringBootTest
-class LoginViewTest {
+class LoginViewTest : BasicIT() {
 
     @Autowired
-    lateinit var view: LoginView
+    lateinit var loginView: LoginView
 
     @Test
     fun formShownWhenContactSelected() {
-        val loginForm = view._get<LoginForm>()
-        val header = view._get<H1>()
+        val loginForm = loginView._get<LoginForm>()
+        val header = loginView._get<H1>()
         assertEquals("Vaadin CRM", header.text)
         assertEquals("login", loginForm.action)
     }
