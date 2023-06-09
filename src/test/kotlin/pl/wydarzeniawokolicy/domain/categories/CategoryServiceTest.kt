@@ -157,7 +157,7 @@ class CategoryServiceTest {
         service.update(currentSlug, categoryToUpdate)
         //then
         val argumentCaptor = argumentCaptor<Category>()
-        verify(repository, times(1)).create(argumentCaptor.capture())
+        verify(repository, times(1)).update(any(), argumentCaptor.capture())
         verify(repository, times(0)).existsBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
             .hasFieldOrPropertyWithValue("name", categoryToUpdate.name)
@@ -188,7 +188,7 @@ class CategoryServiceTest {
         service.update(currentSlug, categoryToUpdate)
         //then
         val argumentCaptor = argumentCaptor<Category>()
-        verify(repository, times(1)).create(argumentCaptor.capture())
+        verify(repository, times(1)).update(any(), argumentCaptor.capture())
         verify(repository, times(1)).existsBySlug(any())
         verify(repository, times(1)).findBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
@@ -256,7 +256,7 @@ class CategoryServiceTest {
         service.update(currentSlug, categoryToUpdate)
         //then
         val argumentCaptor = argumentCaptor<Category>()
-        verify(repository, times(1)).create(argumentCaptor.capture())
+        verify(repository, times(1)).update(any(), argumentCaptor.capture())
         verify(repository, times(3)).existsBySlug(any())
         verify(repository, times(1)).findBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
@@ -293,7 +293,7 @@ class CategoryServiceTest {
         service.update(currentSlug, categoryToUpdate)
         //then
         val argumentCaptor = argumentCaptor<Category>()
-        verify(repository, times(1)).create(argumentCaptor.capture())
+        verify(repository, times(1)).update(any(), argumentCaptor.capture())
         verify(repository, times(2)).findBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
             .hasFieldOrPropertyWithValue("name", "Category After Update")

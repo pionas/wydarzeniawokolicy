@@ -12,7 +12,7 @@ import pl.wydarzeniawokolicy.domain.categories.api.Category
 import pl.wydarzeniawokolicy.shared.NewCategoryDto
 
 
-class CategoryForm(category: Category?, categoryFormAction: CategoryFormAction) : FormLayout() {
+class CategoryForm(private val category: Category?, categoryFormAction: CategoryFormAction) : FormLayout() {
 
     var name = TextField("Name")
     var slug = TextField("Slug")
@@ -25,8 +25,6 @@ class CategoryForm(category: Category?, categoryFormAction: CategoryFormAction) 
             val newCategoryDto = NewCategoryDto()
             binder.writeBeanIfValid(newCategoryDto)
             categoryFormAction.save(newCategoryDto.name!!, newCategoryDto.slug)
-        } else {
-
         }
     }
 
@@ -56,6 +54,9 @@ class CategoryForm(category: Category?, categoryFormAction: CategoryFormAction) 
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY)
         save.addClickShortcut(Key.ENTER)
         close.addClickShortcut(Key.ESCAPE)
+        if (category == null) {
+            delete.isVisible = false
+        }
         return HorizontalLayout(save, delete, close)
     }
 
