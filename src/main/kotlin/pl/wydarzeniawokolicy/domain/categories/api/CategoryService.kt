@@ -1,7 +1,5 @@
 package pl.wydarzeniawokolicy.domain.categories.api
 
-import java.util.*
-
 interface CategoryService {
 
     fun findAll(): List<Category>

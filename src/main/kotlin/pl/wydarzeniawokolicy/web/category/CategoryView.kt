@@ -106,6 +106,9 @@ class CategoryView(
     }
 
     private fun showDialog(category: Category?) {
+        if (ui.isEmpty) {
+            return
+        }
         val dialog = Dialog()
         val categoryForm = CategoryForm(category, object : CategoryFormAction {
             override fun save(name: String, slug: String?) {

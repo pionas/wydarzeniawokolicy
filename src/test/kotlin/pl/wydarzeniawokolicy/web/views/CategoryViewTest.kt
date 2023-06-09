@@ -2,6 +2,7 @@ package pl.wydarzeniawokolicy.web.views
 
 import com.github.mvysny.kaributesting.v10._get
 import com.github.mvysny.kaributesting.v10.expectRows
+import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.textfield.TextField
 import org.junit.jupiter.api.Test
@@ -33,5 +34,14 @@ class CategoryViewTest : BasicIT() {
 
         val grid = categoryView._get<Grid<Category>>()
         grid.expectRows(1)
+    }
+
+    @Test
+    @Sql("/db/categories.sql")
+    fun showCategoryForm() {
+        val categoryCreateButton = categoryView._get<Button>() {
+            text = "Add category"
+        }
+        categoryCreateButton.click()
     }
 }
