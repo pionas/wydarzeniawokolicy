@@ -11,7 +11,6 @@ import java.time.LocalDateTime
 @Table(name = "categories")
 @DynamicUpdate
 data class CategoryEntity(
-
     @Id
     var slug: String,
     var name: String,

@@ -3,7 +3,8 @@ package pl.wydarzeniawokolicy.infrastructure.database.categories
 import org.springframework.stereotype.Repository
 import pl.wydarzeniawokolicy.domain.categories.CategoryRepository
 import pl.wydarzeniawokolicy.domain.categories.api.Category
-import pl.wydarzeniawokolicy.domain.categories.api.CategoryException
+import pl.wydarzeniawokolicy.domain.categories.api.CategoryFilter
+import java.util.*
 
 @Repository
 class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRepository {
@@ -11,6 +12,15 @@ class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRe
     override fun findAll(): List<Category> {
         return repository.findAll()
             .map { Category(it) }
+    }
+
+    override fun findAll(filter: CategoryFilter): List<Category> {
+        return repository.findAll(
+            CategorySpecification.slugEquals(filter.searchPhrase).or(CategorySpecification.nameEquals(filter.searchPhrase)),
+            filter.pageable!!
+        ).get()
+            .map { Category(it) }
+            .toList()
     }
 
     override fun findBySlug(slug: String): Category? {
@@ -54,5 +64,12 @@ class CategoryRepositoryImpl(val repository: CategoryJpaRepository) : CategoryRe
 
     override fun delete(slug: String) {
         repository.deleteById(slug)
+    }
+
+    override fun count(filter: CategoryFilter): Int {
+        val search = filter.searchPhrase
+        return repository.count(
+            CategorySpecification.slugEquals(search).or(CategorySpecification.nameEquals(search))
+        ).toInt()
     }
 }

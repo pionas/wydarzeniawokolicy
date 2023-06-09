@@ -9,6 +9,7 @@ import pl.wydarzeniawokolicy.domain.categories.api.NewCategory
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
 import pl.wydarzeniawokolicy.domain.shared.SlugHelper
 import pl.wydarzeniawokolicy.domain.shared.StringUtils
+import pl.wydarzeniawokolicy.domain.categories.api.CategoryFilter
 import java.util.*
 
 @Service
@@ -20,6 +21,11 @@ class CategoryServiceImpl(
     CategoryService {
 
     override fun findAll(): List<Category> = categoryRepository.findAll()
+    override fun findAll(filter: CategoryFilter): List<Category> {
+        return categoryRepository.findAll(filter)
+    }
+
+    override fun count(filter: CategoryFilter): Int = categoryRepository.count(filter)
 
     override fun create(newCategory: NewCategory): Category {
         verifySlug(null, newCategory.slug)
@@ -56,7 +62,7 @@ class CategoryServiceImpl(
             throw CategoryException.slugExist(slug)
         }
         if (!Objects.equals(categoryBySlug.slug, currentSlug)) {
-            throw CategoryException.slugExist(currentSlug)
+            throw CategoryException.slugExist(slug)
         }
     }
 

@@ -25,4 +25,11 @@ class Category(
         updatedAt = entity.updatedAt,
         deletedAt = entity.deletedAt
     )
+
+    companion object {
+        const val SLUG = "slug"
+        const val NAME = "name"
+        const val CREATED_AT = "createdAt"
+        const val UPDATED_AT = "updatedAt"
+    }
 }

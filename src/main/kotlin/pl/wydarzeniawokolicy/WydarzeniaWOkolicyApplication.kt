@@ -10,6 +10,8 @@ import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Profile
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.stereotype.Component
+import pl.wydarzeniawokolicy.domain.categories.api.CategoryService
+import pl.wydarzeniawokolicy.domain.categories.api.NewCategory
 import pl.wydarzeniawokolicy.domain.events.api.EventService
 import pl.wydarzeniawokolicy.domain.events.api.NewEvent
 import pl.wydarzeniawokolicy.domain.events.api.Sender
@@ -32,13 +34,24 @@ fun main(args: Array<String>) {
 
 @Component
 @Profile("!it")
-class Initializer(val userService: UserService, val eventService: EventService) : ApplicationListener<ContextRefreshedEvent> {
+class Initializer(val userService: UserService, val eventService: EventService, val categoryService: CategoryService) :
+    ApplicationListener<ContextRefreshedEvent> {
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         if (userService.findAll().isEmpty()) {
             userService.create(UserSignUp("john.doe", "john.doe@example.com", "validPassword", "validPassword"))
         }
         if (eventService.findAll().isEmpty()) {
-            eventService.create(NewEvent(name = "Custom Event", sender = Sender("John Doe", "john.doe@example.com", null)))
+            eventService.create(
+                NewEvent(
+                    name = "Custom Event",
+                    sender = Sender("John Doe", "john.doe@example.com", null)
+                )
+            )
+        }
+        if (categoryService.findAll().isEmpty()) {
+            for (i in 1..150) {
+                categoryService.create(NewCategory(name = "Category $i", slug = null))
+            }
         }
     }
 }
