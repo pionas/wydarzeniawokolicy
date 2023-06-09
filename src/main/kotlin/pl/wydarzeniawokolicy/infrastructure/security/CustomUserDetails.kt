@@ -10,13 +10,9 @@ class CustomUserDetails(val user: User) : UserDetails {
     fun getSalt() = user.salt
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        // TODO: after create role module should modified this list
         val list: MutableList<GrantedAuthority> = ArrayList()
-        listOf("USER").forEach {
-            list.add(SimpleGrantedAuthority(it))
-        }
-        if (user.name.lowercase().contains("admin")) {
-            list.add(SimpleGrantedAuthority("VIEWER"))
+        user.roles?.forEach {
+            list.add(SimpleGrantedAuthority(it.name))
         }
         return list
     }
@@ -31,6 +27,6 @@ class CustomUserDetails(val user: User) : UserDetails {
 
     override fun isCredentialsNonExpired(): Boolean = true
 
-    override fun isEnabled(): Boolean = true
+    override fun isEnabled(): Boolean = user.deletedAt == null
 
 }

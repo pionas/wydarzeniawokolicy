@@ -3,6 +3,7 @@ package pl.wydarzeniawokolicy.domain.users
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
+import pl.wydarzeniawokolicy.domain.roles.api.Role
 import pl.wydarzeniawokolicy.domain.users.api.*
 import java.time.LocalDateTime
 
@@ -56,7 +57,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun shouldCreateUser() {
+    fun shouldCreateUserWithoutRoles() {
         // given
         val userSignUp = getUserSignUp()
         val user = getUser(
@@ -65,6 +66,7 @@ class UserServiceTest {
             "john.doe@example.com",
             "johnPassword",
             "johnSalt",
+            emptyList(),
             LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
             null
         )
@@ -80,13 +82,46 @@ class UserServiceTest {
             .hasFieldOrPropertyWithValue("email", user.email)
             .hasFieldOrPropertyWithValue("password", user.password)
             .hasFieldOrPropertyWithValue("salt", user.salt)
+            .hasFieldOrPropertyWithValue("roles", user.roles)
             .hasFieldOrPropertyWithValue("createdAt", user.createdAt)
             .hasFieldOrPropertyWithValue("updatedAt", null)
         verify(repository, times(1)).save(any())
     }
 
     @Test
-    fun shouldUpdateUser() {
+    fun shouldCreateUserWithRoles() {
+        // given
+        val userSignUp = getUserSignUp()
+        val user = getUser(
+            1,
+            "john.doe",
+            "john.doe@example.com",
+            "johnPassword",
+            "johnSalt",
+            listOf("admin", "category_management"),
+            LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
+            null
+        )
+        whenever(userFactory.create(userSignUp)).thenReturn(user)
+        // when
+        service.create(userSignUp)
+        // then
+        val argumentCaptor = argumentCaptor<User>()
+        verify(repository, times(1)).save(argumentCaptor.capture())
+        Assertions.assertThat(argumentCaptor.firstValue)
+            .hasFieldOrPropertyWithValue("id", user.id)
+            .hasFieldOrPropertyWithValue("name", user.name)
+            .hasFieldOrPropertyWithValue("email", user.email)
+            .hasFieldOrPropertyWithValue("password", user.password)
+            .hasFieldOrPropertyWithValue("salt", user.salt)
+            .hasFieldOrPropertyWithValue("roles", user.roles)
+            .hasFieldOrPropertyWithValue("createdAt", user.createdAt)
+            .hasFieldOrPropertyWithValue("updatedAt", null)
+        verify(repository, times(1)).save(any())
+    }
+
+    @Test
+    fun shouldUpdateUserWithoutRoles() {
         // given
         val userDetails = getUserDetails()
         val user = getUser(
@@ -95,6 +130,7 @@ class UserServiceTest {
             "john.doe@example.com",
             "johnPassword",
             "johnSalt",
+            emptyList(),
             LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
             LocalDateTime.of(2023, 5, 22, 19, 12, 0, 0)
         )
@@ -110,6 +146,39 @@ class UserServiceTest {
             .hasFieldOrPropertyWithValue("email", user.email)
             .hasFieldOrPropertyWithValue("password", user.password)
             .hasFieldOrPropertyWithValue("salt", user.salt)
+            .hasFieldOrPropertyWithValue("roles", user.roles)
+            .hasFieldOrPropertyWithValue("createdAt", user.createdAt)
+            .hasFieldOrPropertyWithValue("updatedAt", user.updatedAt)
+        verify(repository, times(1)).save(any())
+    }
+
+    @Test
+    fun shouldUpdateUserWithRoles() {
+        // given
+        val userDetails = getUserDetails()
+        val user = getUser(
+            1,
+            "john.doe",
+            "john.doe@example.com",
+            "johnPassword",
+            "johnSalt",
+            listOf("admin", "category_management"),
+            LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
+            LocalDateTime.of(2023, 5, 22, 19, 12, 0, 0)
+        )
+        whenever(userFactory.update(user.id!!, userDetails)).thenReturn(user)
+        // when
+        service.update(user.id!!, userDetails)
+        // then
+        val argumentCaptor = argumentCaptor<User>()
+        verify(repository, times(1)).save(argumentCaptor.capture())
+        Assertions.assertThat(argumentCaptor.firstValue)
+            .hasFieldOrPropertyWithValue("id", user.id)
+            .hasFieldOrPropertyWithValue("name", user.name)
+            .hasFieldOrPropertyWithValue("email", user.email)
+            .hasFieldOrPropertyWithValue("password", user.password)
+            .hasFieldOrPropertyWithValue("salt", user.salt)
+            .hasFieldOrPropertyWithValue("roles", user.roles)
             .hasFieldOrPropertyWithValue("createdAt", user.createdAt)
             .hasFieldOrPropertyWithValue("updatedAt", user.updatedAt)
         verify(repository, times(1)).save(any())
@@ -124,6 +193,7 @@ class UserServiceTest {
             "john.doe@example.com",
             "johnPassword",
             "johnSalt",
+            listOf("admin", "category_management"),
             LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
             LocalDateTime.of(2023, 5, 22, 19, 12, 0, 0)
         )
@@ -136,6 +206,7 @@ class UserServiceTest {
             .hasFieldOrPropertyWithValue("name", user.name)
             .hasFieldOrPropertyWithValue("email", user.email)
             .hasFieldOrPropertyWithValue("salt", user.salt)
+            .hasFieldOrPropertyWithValue("roles", user.roles)
             .hasFieldOrPropertyWithValue("password", user.password)
             .hasFieldOrPropertyWithValue("createdAt", user.createdAt)
             .hasFieldOrPropertyWithValue("updatedAt", user.updatedAt)
@@ -173,16 +244,19 @@ class UserServiceTest {
                 "john.doe@example.com",
                 "johnPassword",
                 "johnSalt",
+                listOf("admin", "category_management"),
                 LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0),
                 null
             ),
             getUser(
                 2, "anna.doe", "anna.doe@example.com", "annaPassword", "annaSalt",
+                listOf("admin"),
                 LocalDateTime.of(2023, 5, 22, 11, 12, 10, 0),
                 null
             ),
             getUser(
                 3, "jane.doe", "jane.doe@example.com", "janePassword", "janeSalt",
+                emptyList(),
                 LocalDateTime.of(2023, 5, 22, 11, 12, 20, 0),
                 null
             ),
@@ -195,14 +269,20 @@ class UserServiceTest {
         email: String,
         password: String?,
         salt: String?,
+        roles: List<String>?,
         createdAt: LocalDateTime,
         updatedAt: LocalDateTime?,
     ): User {
-        return User(id, name, email, password, salt, createdAt, updatedAt, null)
+        val roleList = roles?.map { getRole(it) }
+        return User(id, name, email, password, salt, roleList, createdAt, updatedAt, null)
     }
 
     private fun getUserSignUp() = UserSignUp("name", "email", "password", "passwordConfirm")
 
     private fun getUserDetails() = UserDetails("newName", "newEmail", "oldPassword", "newPassword", "passwordConfirm")
+
+    private fun getRole(
+        slug: String
+    ) = Role(slug, slug, LocalDateTime.of(2023, 6, 9, 13, 59, 20, 0), null, null)
 
 }

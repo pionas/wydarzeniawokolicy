@@ -15,6 +15,8 @@ import pl.wydarzeniawokolicy.domain.categories.api.NewCategory
 import pl.wydarzeniawokolicy.domain.events.api.EventService
 import pl.wydarzeniawokolicy.domain.events.api.NewEvent
 import pl.wydarzeniawokolicy.domain.events.api.Sender
+import pl.wydarzeniawokolicy.domain.roles.api.NewRole
+import pl.wydarzeniawokolicy.domain.roles.api.RoleService
 import pl.wydarzeniawokolicy.domain.users.api.UserService
 import pl.wydarzeniawokolicy.domain.users.api.UserSignUp
 
@@ -34,11 +36,19 @@ fun main(args: Array<String>) {
 
 @Component
 @Profile("!it")
-class Initializer(val userService: UserService, val eventService: EventService, val categoryService: CategoryService) :
+class Initializer(val roleService: RoleService, val userService: UserService, val eventService: EventService, val categoryService: CategoryService) :
     ApplicationListener<ContextRefreshedEvent> {
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
+        if (roleService.findAll().isEmpty()) {
+            roleService.create(NewRole("Admin", "admin"))
+            roleService.create(NewRole("Category management", "category-management"))
+            roleService.create(NewRole("Category create", "category-create"))
+            roleService.create(NewRole("Category delete", "category-delete"))
+        }
         if (userService.findAll().isEmpty()) {
-            userService.create(UserSignUp("john.doe", "john.doe@example.com", "validPassword", "validPassword"))
+            userService.create(
+                UserSignUp("john.doe", "john.doe@example.com", "validPassword", "validPassword", listOf("admin"))
+            )
         }
         if (eventService.findAll().isEmpty()) {
             eventService.create(

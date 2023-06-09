@@ -49,7 +49,7 @@ internal class RoleRestControllerIT : BasicIT() {
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result.statusCode)
         val roles = result.body!!
-        Assertions.assertThat(roles).hasSize(3)
+        Assertions.assertThat(roles).hasSize(7)
         Assertions.assertThat(roles[0])
             .hasFieldOrPropertyWithValue("name", "Role 1")
             .hasFieldOrPropertyWithValue("slug", "role-1")

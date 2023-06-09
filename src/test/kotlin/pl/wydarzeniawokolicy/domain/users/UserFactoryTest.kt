@@ -6,24 +6,29 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import pl.wydarzeniawokolicy.domain.roles.RoleRepository
+import pl.wydarzeniawokolicy.domain.roles.api.Role
 import pl.wydarzeniawokolicy.domain.shared.DateTimeUtils
+import pl.wydarzeniawokolicy.domain.shared.NotFoundException
 import pl.wydarzeniawokolicy.domain.shared.StringUtils
 import pl.wydarzeniawokolicy.domain.users.api.*
 import java.time.LocalDateTime
 
 class UserFactoryTest {
 
-    private val repository: UserRepository = mock()
+    private val userRepository: UserRepository = mock()
+    private val roleRepository: RoleRepository = mock()
     private val dateTimeUtils: DateTimeUtils = mock()
     private val stringUtils: StringUtils = mock()
     private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
-    private val userFactory: UserFactory = UserFactory(repository, dateTimeUtils, passwordEncoder, stringUtils)
+    private val userFactory: UserFactory =
+        UserFactory(userRepository, roleRepository, dateTimeUtils, passwordEncoder, stringUtils)
 
     @Test
     fun shouldThrowExceptionWhenUserByNameExist() {
         // given
-        val userSignUp = getUserSignUp("password", "passwordConfirm")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(getUser(1L, null, "name", "email"))
+        val userSignUp = getUserSignUp(password = "password", passwordConfirm = "passwordConfirm")
+        whenever(userRepository.findByName(userSignUp.name)).thenReturn(getUser(1L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.create(userSignUp) }, UserNameExistException::class.java)
@@ -34,9 +39,9 @@ class UserFactoryTest {
     @Test
     fun shouldThrowExceptionWhenUserByEmailExist() {
         // given
-        val userSignUp = getUserSignUp("password", "passwordConfirm")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(null)
-        whenever(repository.findByEmail(userSignUp.email)).thenReturn(getUser(1L, null, "name", "email"))
+        val userSignUp = getUserSignUp(password = "password", passwordConfirm = "passwordConfirm")
+        whenever(userRepository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userSignUp.email)).thenReturn(getUser(1L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.create(userSignUp) }, UserEmailExistException::class.java)
@@ -47,9 +52,9 @@ class UserFactoryTest {
     @Test
     fun shouldThrowExceptionWhenUserPasswordNotMatches() {
         // given
-        val userSignUp = getUserSignUp("password", "passwordConfirm")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(null)
-        whenever(repository.findByEmail(userSignUp.email)).thenReturn(null)
+        val userSignUp = getUserSignUp(password = "password", passwordConfirm = "passwordConfirm")
+        whenever(userRepository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userSignUp.email)).thenReturn(null)
         // when
         val exception =
             catchThrowableOfType({ userFactory.create(userSignUp) }, UserPasswordCompareException::class.java)
@@ -58,13 +63,30 @@ class UserFactoryTest {
     }
 
     @Test
-    fun shouldCreateUser() {
+    fun shouldThrowExceptionWhenRoleNotExist() {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
+        val salt = "salt"
+        val userSignUp = getUserSignUp("validPassword", "validPassword", listOf("ADMIN"))
+        whenever(userRepository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userSignUp.email)).thenReturn(null)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
+        // when
+        val exception =
+            catchThrowableOfType({ userFactory.create(userSignUp) }, NotFoundException::class.java)
+        // then
+        assertThat(exception.message).isEqualTo("Role by slug ADMIN not exist")
+    }
+
+    @Test
+    fun shouldCreateUserWithoutRoles() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         val salt = "salt"
         val userSignUp = getUserSignUp("validPassword", "validPassword")
-        whenever(repository.findByName(userSignUp.name)).thenReturn(null)
-        whenever(repository.findByEmail(userSignUp.email)).thenReturn(null)
+        whenever(userRepository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userSignUp.email)).thenReturn(null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
         // when
@@ -80,11 +102,37 @@ class UserFactoryTest {
     }
 
     @Test
+    fun shouldCreateUserWithRoles() {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
+        val salt = "salt"
+        val userSignUp = getUserSignUp("validPassword", "validPassword", listOf("ADMIN"))
+        whenever(userRepository.findByName(userSignUp.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userSignUp.email)).thenReturn(null)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
+        userSignUp.roles?.forEach {
+            whenever(roleRepository.findBySlug(it.lowercase())).thenReturn(getRole(it))
+        }
+        // when
+        val user = userFactory.create(userSignUp)
+        // then
+        assertThat(user)
+            .hasFieldOrPropertyWithValue("id", null)
+            .hasFieldOrPropertyWithValue("name", "name")
+            .hasFieldOrPropertyWithValue("email", "email")
+            .hasFieldOrPropertyWithValue("salt", salt)
+            .hasFieldOrPropertyWithValue("salt", salt)
+            .hasFieldOrPropertyWithValue("createdAt", localDateTime)
+        assertThat(passwordEncoder.matches(userSignUp.password.plus(salt), user.password)).isTrue
+    }
+
+    @Test
     fun shouldThrowExceptionWhenUserNotExist() {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(null)
+        whenever(userRepository.findById(userId)).thenReturn(null)
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserNotFoundException::class.java)
@@ -97,8 +145,8 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
-        whenever(repository.findByName(userDetails.name)).thenReturn(getUser(2L, null, "name", "email"))
+        whenever(userRepository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(getUser(2L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserNameExistException::class.java)
@@ -111,9 +159,9 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
-        whenever(repository.findByName(userDetails.name)).thenReturn(null)
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(getUser(2L, null, "name", "email"))
+        whenever(userRepository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userDetails.email)).thenReturn(getUser(2L, null, "name", "email"))
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserEmailExistException::class.java)
@@ -126,9 +174,9 @@ class UserFactoryTest {
         // given
         val userId = 1L
         val userDetails = getUserDetails("newPassword", "passwordConfirm")
-        whenever(repository.findById(userId)).thenReturn(getUser(1L, null, "name", "email"))
-        whenever(repository.findByName(userDetails.name)).thenReturn(null)
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(null)
+        whenever(userRepository.findById(userId)).thenReturn(getUser(1L, null, "name", "email"))
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userDetails.email)).thenReturn(null)
         // when
         val exception =
             catchThrowableOfType({ userFactory.update(userId, userDetails) }, UserPasswordCompareException::class.java)
@@ -142,9 +190,9 @@ class UserFactoryTest {
         val userId = 1L
         val userDetails = getUserDetails("password", "password")
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
-        whenever(repository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
-        whenever(repository.findByName(userDetails.name)).thenReturn(null)
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(null)
+        whenever(userRepository.findById(userId)).thenReturn(getUser(userId, null, "name", "email"))
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userDetails.email)).thenReturn(null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         // when
         val exception =
@@ -154,13 +202,13 @@ class UserFactoryTest {
     }
 
     @Test
-    fun shouldUpdateUser() {
+    fun shouldThrowExceptionWhenTryUpdateButRoleNotExist() {
         // given
         val userId = 1L
         val salt = "newSalt"
-        val userDetails = getUserDetails("password", "password")
+        val userDetails = getUserDetails("password", "password", listOf("Manager"))
         val localDateTime = LocalDateTime.of(2023, 5, 22, 19, 3, 0, 0)
-        whenever(repository.findById(userId)).thenReturn(
+        whenever(userRepository.findById(userId)).thenReturn(
             getUser(
                 userId,
                 "\$2a\$10\$xAsTwpeJHG.nAfBZsyfrCOWJOfsZ2lZ3k73qeYP8eGMLeusQ.JlFi",
@@ -168,15 +216,42 @@ class UserFactoryTest {
                 "email"
             )
         )
-        whenever(repository.findByName(userDetails.name)).thenReturn(null)
-        whenever(repository.findByEmail(userDetails.email)).thenReturn(null)
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userDetails.email)).thenReturn(null)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
+        // when
+        val exception =
+            catchThrowableOfType({ userFactory.update(userId, userDetails) }, NotFoundException::class.java)
+        // then
+        assertThat(exception.message).isEqualTo("Role by slug Manager not exist")
+    }
+
+    @Test
+    fun shouldUpdateUserWithoutRoles() {
+        // given
+        val userId = 1L
+        val salt = "newSalt"
+        val userDetails = getUserDetails("password", "password")
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 19, 3, 0, 0)
+        whenever(userRepository.findById(userId)).thenReturn(
+            getUser(
+                userId,
+                "\$2a\$10\$xAsTwpeJHG.nAfBZsyfrCOWJOfsZ2lZ3k73qeYP8eGMLeusQ.JlFi",
+                "name",
+                "email",
+                listOf("Admin")
+            )
+        )
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userDetails.email)).thenReturn(null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
         // when
         userFactory.update(userId, userDetails)
         // then
         val argumentCaptor = argumentCaptor<User>()
-        verify(repository, times(1)).save(argumentCaptor.capture())
+        verify(userRepository, times(1)).save(argumentCaptor.capture())
         assertThat(argumentCaptor.firstValue)
             .hasFieldOrPropertyWithValue("id", userId)
             .hasFieldOrPropertyWithValue("name", userDetails.name)
@@ -192,13 +267,82 @@ class UserFactoryTest {
         ).isTrue
     }
 
+    @Test
+    fun shouldUpdateUserWithRoles() {
+        // given
+        val userId = 1L
+        val salt = "newSalt"
+        val userDetails = getUserDetails("password", "password", listOf("Manager"))
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 19, 3, 0, 0)
+        whenever(userRepository.findById(userId)).thenReturn(
+            getUser(
+                userId,
+                "\$2a\$10\$xAsTwpeJHG.nAfBZsyfrCOWJOfsZ2lZ3k73qeYP8eGMLeusQ.JlFi",
+                "name",
+                "email"
+            )
+        )
+        whenever(userRepository.findByName(userDetails.name)).thenReturn(null)
+        whenever(userRepository.findByEmail(userDetails.email)).thenReturn(null)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        whenever(stringUtils.randomAlphanumeric(10)).thenReturn(salt)
+        userDetails.roles?.forEach {
+            whenever(roleRepository.findBySlug(it.lowercase())).thenReturn(getRole(it))
+        }
+        // when
+        userFactory.update(userId, userDetails)
+        // then
+        val argumentCaptor = argumentCaptor<User>()
+        verify(userRepository, times(1)).save(argumentCaptor.capture())
+        assertThat(argumentCaptor.firstValue)
+            .hasFieldOrPropertyWithValue("id", userId)
+            .hasFieldOrPropertyWithValue("name", userDetails.name)
+            .hasFieldOrPropertyWithValue("email", userDetails.email)
+            .hasFieldOrPropertyWithValue("salt", salt)
+            .hasFieldOrPropertyWithValue("roles", listOf(getRole("Manager")))
+            .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 22, 12, 10, 0, 0))
+            .hasFieldOrPropertyWithValue("updatedAt", localDateTime)
+        assertThat(
+            passwordEncoder.matches(
+                userDetails.password.plus(salt),
+                "\$2a\$10\$bWf3STnY/vrO5xgF2EOlm.qsrra4GG30s5PuH3ttm3PfGWtJa79KW"
+            )
+        ).isTrue
+    }
 
-    private fun getUserSignUp(password: String, passwordConfirm: String): UserSignUp =
-        UserSignUp("name", "email", password, passwordConfirm)
 
-    private fun getUser(userId: Long, password: String?, name: String, email: String): User =
-        User(userId, name, email, password, "salt", LocalDateTime.of(2023, 5, 22, 12, 10, 0, 0), null, null)
+    private fun getUserSignUp(password: String, passwordConfirm: String, roles: List<String>? = null): UserSignUp =
+        UserSignUp("name", "email", password, passwordConfirm, roles)
 
-    private fun getUserDetails(password: String, passwordConfirm: String): UserDetails =
-        UserDetails("newName", "newEmail", "oldPassword", password, passwordConfirm)
+    private fun getUser(
+        userId: Long,
+        password: String?,
+        name: String,
+        email: String,
+        roles: List<String>? = emptyList()
+    ): User {
+        val roleList = roles?.map { getRole(it) }
+        return User(
+            userId,
+            name,
+            email,
+            password,
+            "salt",
+            roleList,
+            LocalDateTime.of(2023, 5, 22, 12, 10, 0, 0),
+            null,
+            null
+        )
+    }
+
+    private fun getUserDetails(
+        password: String,
+        passwordConfirm: String,
+        roles: List<String>? = emptyList()
+    ): UserDetails =
+        UserDetails("newName", "newEmail", "oldPassword", password, passwordConfirm, roles)
+
+    private fun getRole(
+        slug: String
+    ) = Role(slug, slug, LocalDateTime.of(2023, 6, 9, 13, 59, 20, 0), null, null)
 }
