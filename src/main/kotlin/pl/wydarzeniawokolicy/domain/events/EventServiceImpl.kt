@@ -43,22 +43,22 @@ class EventServiceImpl(
         repository.delete(slug)
     }
 
-    override fun update(slug: String, newEvent: NewEvent): Event {
+    override fun update(slug: String, eventToUpdate: NewEvent): Event {
         val event = repository.findBySlug(slug) ?: throw EventException.eventNotFound(slug)
-        verifySlug(event.slug, newEvent.slug)
+        verifySlug(event.slug, eventToUpdate.slug)
         event.apply {
-            this.name = newEvent.name
-            this.slug = getSlug(newEvent)
-            this.description = newEvent.description
-            this.content = newEvent.content
-            this.online = newEvent.online
-            this.website = newEvent.website
-            this.ticketWebsite = newEvent.ticketWebsite
-            this.promo = newEvent.promo
-            this.active = newEvent.active
-            this.address = newEvent.address
-            this.location = newEvent.location
-            this.sender = newEvent.sender
+            this.name = eventToUpdate.name
+            this.slug = getSlug(eventToUpdate)
+            this.description = eventToUpdate.description
+            this.content = eventToUpdate.content
+            this.online = eventToUpdate.online
+            this.website = eventToUpdate.website
+            this.ticketWebsite = eventToUpdate.ticketWebsite
+            this.promo = eventToUpdate.promo
+            this.active = eventToUpdate.active
+            this.address = eventToUpdate.address
+            this.location = eventToUpdate.location
+            this.sender = eventToUpdate.sender
             this.updatedAt = dateTimeUtils.getLocalDateTimeNow()
         }
         return repository.save(event)

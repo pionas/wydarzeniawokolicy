@@ -42,10 +42,10 @@ class CategoryServiceImpl(
     }
 
     @Transactional
-    override fun update(currentSlug: String, newCategory: NewCategory): Category {
+    override fun update(currentSlug: String, categoryToUpdate: NewCategory): Category {
         val category = categoryRepository.findBySlug(currentSlug) ?: throw CategoryException.slugNotFound(currentSlug)
-        verifySlug(category.slug, newCategory.slug)
-        category.update(newCategory.name, getSlug(newCategory), dateTimeUtils.getLocalDateTimeNow())
+        verifySlug(category.slug, categoryToUpdate.slug)
+        category.update(categoryToUpdate.name, getSlug(categoryToUpdate), dateTimeUtils.getLocalDateTimeNow())
         return categoryRepository.update(currentSlug, category)
     }
 
