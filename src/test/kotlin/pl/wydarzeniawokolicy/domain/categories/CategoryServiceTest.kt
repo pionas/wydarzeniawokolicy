@@ -79,7 +79,7 @@ class CategoryServiceTest {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(repository.findBySlug(any())).thenReturn(null)
         whenever(repository.existsBySlug(any())).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("category-1")
+        whenever(stringUtils.slug(any(), any())).thenReturn("category-1")
         val category = NewCategory("Category 1", null)
         // when
         service.create(category)
@@ -102,7 +102,7 @@ class CategoryServiceTest {
         whenever(repository.existsBySlug("category")).thenReturn(true)
         whenever(repository.existsBySlug("category1")).thenReturn(true)
         whenever(repository.existsBySlug("category2")).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("category")
+        whenever(stringUtils.slug(any(), any())).thenReturn("category")
         val category = NewCategory("Category", null)
         // when
         service.create(category)
@@ -174,7 +174,7 @@ class CategoryServiceTest {
         val categoryToUpdate = NewCategory("Category After Update", null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("category-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("category-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getCategory(
                 "category 1",
@@ -243,7 +243,7 @@ class CategoryServiceTest {
         val categoryToUpdate = NewCategory("Category After Update", null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(true, true, false)
-        whenever(stringUtils.slug(any())).thenReturn("category-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("category-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getCategory(
                 "category 1",
@@ -274,7 +274,7 @@ class CategoryServiceTest {
         val categoryToUpdate = NewCategory("Category After Update", currentSlug)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(true, true, false)
-        whenever(stringUtils.slug(any())).thenReturn("category-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("category-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getCategory(
                 "category 1",

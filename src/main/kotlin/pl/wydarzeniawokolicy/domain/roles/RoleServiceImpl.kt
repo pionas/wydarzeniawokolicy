@@ -23,7 +23,7 @@ class RoleServiceImpl(
     override fun create(newRole: NewRole): Role {
         verifySlug(null, newRole.slug)
         val role = Role(
-            name = newRole.name,
+            name = newRole.name.uppercase(),
             slug = getSlug(newRole),
             createdAt = dateTimeUtils.getLocalDateTimeNow()
         )
@@ -37,7 +37,7 @@ class RoleServiceImpl(
     override fun update(currentSlug: String, newRole: NewRole): Role {
         val role = roleRepository.findBySlug(currentSlug) ?: throw RoleException.slugNotFound(currentSlug)
         verifySlug(role.slug, newRole.slug)
-        role.update(newRole.name, getSlug(newRole), dateTimeUtils.getLocalDateTimeNow())
+        role.update(newRole.name.uppercase(), getSlug(newRole), dateTimeUtils.getLocalDateTimeNow())
         return roleRepository.create(role)
     }
 
@@ -59,7 +59,7 @@ class RoleServiceImpl(
     }
 
     private fun getSlug(newRole: NewRole): String {
-        return newRole.slug ?: SlugHelper.generateSlug(roleRepository, stringUtils.slug(newRole.name))
+        return newRole.slug ?: SlugHelper.generateSlug(roleRepository, stringUtils.slug(newRole.name, "_"))
     }
 
 }

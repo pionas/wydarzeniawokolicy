@@ -3,6 +3,7 @@ package pl.wydarzeniawokolicy.api.categories
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import pl.wydarzeniawokolicy.domain.categories.api.CategoryService
 import pl.wydarzeniawokolicy.shared.CategoryDto
@@ -15,10 +16,11 @@ class CategoryRestController(
     private val mapper: CategoryMapper,
 ) {
 
-    @GetMapping("")
+    @GetMapping
     fun getAll(): List<CategoryDto> = mapper.mapToDto(service.findAll())
 
-    @PostMapping("")
+    @PostMapping
+    @PreAuthorize("hasAnyRole('CATEGORY_MANAGEMENT','ADMIN','CATEGORY_CREATE')")
     fun create(@Valid @RequestBody category: NewCategoryDto): ResponseEntity<CategoryDto> {
         val createdCategory = service.create(mapper.mapToDomain(category))
         return ResponseEntity(mapper.mapToDto(createdCategory), HttpStatus.CREATED)
@@ -30,6 +32,7 @@ class CategoryRestController(
     }
 
     @PutMapping("/{slug}")
+    @PreAuthorize("hasAnyRole('CATEGORY_MANAGEMENT','ADMIN','CATEGORY_CREATE')")
     fun update(
         @PathVariable("slug") slug: String,
         @Valid @RequestBody category: NewCategoryDto
@@ -39,7 +42,8 @@ class CategoryRestController(
     }
 
     @DeleteMapping("/{slug}")
-    fun delete(@PathVariable("slug") slug: String): ResponseEntity<Void> {
+    @PreAuthorize("hasAnyRole('CATEGORY_MANAGEMENT','ADMIN','CATEGORY_DELETE')")
+    fun delete(@PathVariable("slug") slug: String): ResponseEntity<Unit> {
         service.delete(slug)
         return ResponseEntity(HttpStatus.OK)
     }

@@ -17,7 +17,7 @@ import pl.wydarzeniawokolicy.infrastructure.security.CustomAuthenticationProvide
 
 
 @Configuration(proxyBeanMethods = false)
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity
 class SecurityConfig {
 
     @Value("\${spring.security.debug:false}")
@@ -30,7 +30,7 @@ class SecurityConfig {
 
     @Bean
     fun grantedAuthorityDefaults(): GrantedAuthorityDefaults {
-        return GrantedAuthorityDefaults("") // Remove the ROLE_ prefix
+        return GrantedAuthorityDefaults("")
     }
 
     @Bean

@@ -25,12 +25,31 @@ import java.util.stream.Stream
 internal class CategoryRestControllerIT : BasicIT() {
 
     @Test
-    @Disabled
-    fun shouldReturnUnauthorized() {
+    fun shouldReturnUnauthorizedWhenTryCreateCategory() {
         // given
-
+        val categoryDto = NewCategoryDto("dsa", null)
         // when
-        val result = restApiTemplate.getForEntity("/categories", List::class.java)
+        val result =
+            Assertions.catchThrowableOfType(
+                { forbiddenRestTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+    }
+
+    @Test
+    fun shouldReturnWrongPasswordWhenTryCreateCategory() {
+        // given
+        val categoryDto = NewCategoryDto("dsa", null)
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { wrongPasswordRestTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
 
         // then
         assertNotNull(result)
@@ -67,43 +86,61 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    fun shouldReturnInternalServerErrorWhenTryCreate() {
+    fun shouldReturnForbiddenWhenTryCreateCategory() {
         // given
-        // when
-        val result =
-            Assertions.catchThrowableOfType(
-                { restApiTemplate.postForEntity("/categories", HashMap<String, Any>(), Any::class.java) },
-                HttpClientErrorException::class.java
-            )
-        // then
-        assertNotNull(result)
-        assertEquals(HttpStatus.BAD_REQUEST, result?.statusCode)
-    }
-
-    @Test
-    fun shouldReturnBadRequestWhenTryCreate() {
-        // given
-        val categoryDto = NewCategoryDto("", null)
+        val categoryDto = NewCategoryDto("dsa", null)
         // when
         val result =
             Assertions.catchThrowableOfType(
                 { restApiTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
+    }
+
+    @Test
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    fun shouldReturnInternalServerErrorWhenTryCreate() {
+        // given
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { authorizedRestTemplate.postForEntity("/categories", HashMap<String, Any>(), Any::class.java) },
+                HttpClientErrorException::class.java
+            )
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.BAD_REQUEST, result?.statusCode)
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    fun shouldReturnBadRequestWhenTryCreate() {
+        // given
+        val categoryDto = NewCategoryDto("", null)
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { authorizedRestTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.BAD_REQUEST, result?.statusCode)
+    }
+
+    @Test
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql")
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val categoryDto = NewCategoryDto("Category 1", null)
         // when
-        val category = restApiTemplate.postForEntity("/categories", categoryDto, CategoryDto::class.java)
+        val category = authorizedRestTemplate.postForEntity("/categories", categoryDto, CategoryDto::class.java)
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.CREATED, category?.statusCode)
@@ -144,12 +181,13 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
     fun shouldReturnInternalServerErrorWhenTryUpdate() {
         // given
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/categories/category-1", HashMap<String, Any>(), Any::class.java) },
+                { authorizedRestTemplate.put("/categories/category-1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -158,6 +196,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
     fun shouldReturnNotFoundWhenTryUpdateByCategoryNotExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -168,7 +207,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
+                    authorizedRestTemplate.exchange(
                         "/categories/category-1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -183,7 +222,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql("/db/categories.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
     fun shouldReturnBadRequestWhenTryUpdateButCategorySlugExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -194,7 +233,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
+                    authorizedRestTemplate.exchange(
                         "/categories/category-1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -210,13 +249,14 @@ internal class CategoryRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideCategoryDtoList")
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
     fun shouldReturnBadRequestWhenTryUpdate(categoryName: String?, categorySlug: String?, message: String) {
         // given
         val categoryDto = NewCategoryDto(categoryName, categorySlug)
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/categories/category-1", categoryDto, Any::class.java) },
+                { authorizedRestTemplate.put("/categories/category-1", categoryDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -227,7 +267,7 @@ internal class CategoryRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideCategoryDtoValidList")
-    @Sql("/db/categories.sql")
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql")
     fun shouldUpdate(categoryName: String, categorySlug: String?, expectedCategorySlug: String) {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 25, 19, 57, 0, 0)
@@ -236,7 +276,7 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(categoryDto)
         val category: ResponseEntity<CategoryDto> =
-            restApiTemplate.exchange("/categories/category-1", HttpMethod.PUT, requestEntity, CategoryDto::class.java)
+            authorizedRestTemplate.exchange("/categories/category-1", HttpMethod.PUT, requestEntity, CategoryDto::class.java)
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.OK, category.statusCode)
@@ -248,11 +288,11 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql("/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql")
     fun shouldDelete() {
         // given
         // when
-        val result = restApiTemplate.exchange("/categories/category-1", HttpMethod.DELETE, null, Any::class.java)
+        val result = authorizedRestTemplate.exchange("/categories/category-1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val categoryEntity = dbUtils.em().find(CategoryEntity::class.java, "category-1")

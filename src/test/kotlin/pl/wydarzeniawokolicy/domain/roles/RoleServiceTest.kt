@@ -67,7 +67,7 @@ class RoleServiceTest {
         verify(repository, times(1)).create(argumentCaptor.capture())
         verify(repository, times(1)).findBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
-            .hasFieldOrPropertyWithValue("name", "Role 1")
+            .hasFieldOrPropertyWithValue("name", "ROLE 1")
             .hasFieldOrPropertyWithValue("slug", "role-1")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
@@ -79,7 +79,7 @@ class RoleServiceTest {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(repository.findBySlug(any())).thenReturn(null)
         whenever(repository.existsBySlug(any())).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("role-1")
+        whenever(stringUtils.slug(any(), any())).thenReturn("role-1")
         val role = NewRole("Role 1", null)
         // when
         service.create(role)
@@ -88,7 +88,7 @@ class RoleServiceTest {
         verify(repository, times(1)).create(argumentCaptor.capture())
         verify(repository, times(1)).existsBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
-            .hasFieldOrPropertyWithValue("name", "Role 1")
+            .hasFieldOrPropertyWithValue("name", "ROLE 1")
             .hasFieldOrPropertyWithValue("slug", "role-1")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
@@ -102,7 +102,7 @@ class RoleServiceTest {
         whenever(repository.existsBySlug("role")).thenReturn(true)
         whenever(repository.existsBySlug("role1")).thenReturn(true)
         whenever(repository.existsBySlug("role2")).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("role")
+        whenever(stringUtils.slug(any(), any())).thenReturn("role")
         val role = NewRole("Role", null)
         // when
         service.create(role)
@@ -111,7 +111,7 @@ class RoleServiceTest {
         verify(repository, times(1)).create(argumentCaptor.capture())
         verify(repository, times(3)).existsBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
-            .hasFieldOrPropertyWithValue("name", "Role")
+            .hasFieldOrPropertyWithValue("name", "ROLE")
             .hasFieldOrPropertyWithValue("slug", "role2")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
@@ -160,7 +160,7 @@ class RoleServiceTest {
         verify(repository, times(1)).create(argumentCaptor.capture())
         verify(repository, times(0)).existsBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
-            .hasFieldOrPropertyWithValue("name", roleToUpdate.name)
+            .hasFieldOrPropertyWithValue("name", roleToUpdate.name.uppercase())
             .hasFieldOrPropertyWithValue("slug", roleToUpdate.slug)
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
             .hasFieldOrPropertyWithValue("updatedAt", localDateTime.plusDays(1))
@@ -174,7 +174,7 @@ class RoleServiceTest {
         val roleToUpdate = NewRole("Role After Update", null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("role-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("role-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getRole(
                 "role 1",
@@ -192,7 +192,7 @@ class RoleServiceTest {
         verify(repository, times(1)).existsBySlug(any())
         verify(repository, times(1)).findBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
-            .hasFieldOrPropertyWithValue("name", "Role After Update")
+            .hasFieldOrPropertyWithValue("name", "ROLE AFTER UPDATE")
             .hasFieldOrPropertyWithValue("slug", "role-after-update")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
             .hasFieldOrPropertyWithValue("updatedAt", localDateTime.plusDays(1))
@@ -243,7 +243,7 @@ class RoleServiceTest {
         val roleToUpdate = NewRole("Role After Update", null)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(true, true, false)
-        whenever(stringUtils.slug(any())).thenReturn("role-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("role-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getRole(
                 "role 1",
@@ -260,7 +260,7 @@ class RoleServiceTest {
         verify(repository, times(3)).existsBySlug(any())
         verify(repository, times(1)).findBySlug(any())
         Assertions.assertThat(argumentCaptor.firstValue)
-            .hasFieldOrPropertyWithValue("name", "Role After Update")
+            .hasFieldOrPropertyWithValue("name", "ROLE AFTER UPDATE")
             .hasFieldOrPropertyWithValue("slug", "role-after-update2")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
             .hasFieldOrPropertyWithValue("updatedAt", localDateTime.plusDays(1))

@@ -26,14 +26,12 @@ flyway:
 
 logging:
   level:
-    org:
-      springframework:
-        security: debug
+    root: debug
 
 users:
   valid:
-    username: admin
-    password: admin
+    username: john.doe
+    password: validPassword
   invalid:
     username: user
     password: userpass

@@ -12,16 +12,11 @@ import org.springframework.web.client.DefaultResponseErrorHandler
 class RestITConfig {
 
     private val ROOT_URI = "http://localhost:7778/"
-    private val ROOT_API_URI = ROOT_URI.plus("/api/v1")
+    private val ROOT_API_URI = ROOT_URI.plus("api/v1")
 
     @Bean
     fun restApiTemplate(): TestRestTemplate {
         return buildRestTemplate(null, null, ROOT_API_URI)
-    }
-
-    @Bean
-    fun restTemplate(): TestRestTemplate {
-        return buildRestTemplate(null, null, ROOT_URI)
     }
 
     @Bean
@@ -52,11 +47,8 @@ class RestITConfig {
     ): TestRestTemplate {
         val restTemplateBuilder = RestTemplateBuilder()
             .rootUri(rootUri)
-        val testRestTemplate = TestRestTemplate(restTemplateBuilder)
+        val testRestTemplate = TestRestTemplate(restTemplateBuilder, username, password)
         testRestTemplate.restTemplate.errorHandler = DefaultResponseErrorHandler()
-        if (listOfNotNull(username, password).size == 2) {
-            testRestTemplate.withBasicAuth(username, password)
-        }
         return testRestTemplate
     }
 }

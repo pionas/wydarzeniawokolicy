@@ -52,11 +52,11 @@ internal class RoleRestControllerIT : BasicIT() {
         Assertions.assertThat(roles).hasSize(7)
         Assertions.assertThat(roles[0])
             .hasFieldOrPropertyWithValue("name", "Role 1")
-            .hasFieldOrPropertyWithValue("slug", "role-1")
+            .hasFieldOrPropertyWithValue("slug", "role_1")
             .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 28, 7, 34, 0, 0))
         Assertions.assertThat(roles[1])
             .hasFieldOrPropertyWithValue("name", "Role 2")
-            .hasFieldOrPropertyWithValue("slug", "role-2")
+            .hasFieldOrPropertyWithValue("slug", "role_2")
             .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 28, 7, 34, 10, 0))
         Assertions.assertThat(roles[2])
             .hasFieldOrPropertyWithValue("name", "Role 3")
@@ -106,8 +106,8 @@ internal class RoleRestControllerIT : BasicIT() {
         assertNotNull(role)
         assertEquals(HttpStatus.CREATED, role?.statusCode)
         Assertions.assertThat(role.body)
-            .hasFieldOrPropertyWithValue("name", roleDto.name)
-            .hasFieldOrPropertyWithValue("slug", "role-11")
+            .hasFieldOrPropertyWithValue("name", roleDto.name!!.uppercase())
+            .hasFieldOrPropertyWithValue("slug", "role_11")
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
 
@@ -116,13 +116,13 @@ internal class RoleRestControllerIT : BasicIT() {
     fun shouldReturnRoleDetailsById() {
         // given
         // when
-        val result = restApiTemplate.getForEntity("/roles/role-2", RoleDto::class.java)
+        val result = restApiTemplate.getForEntity("/roles/role_2", RoleDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
         Assertions.assertThat(result.body!!)
             .hasFieldOrPropertyWithValue("name", "Role 2")
-            .hasFieldOrPropertyWithValue("slug", "role-2")
+            .hasFieldOrPropertyWithValue("slug", "role_2")
             .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 28, 7, 34, 10, 0))
             .hasFieldOrPropertyWithValue("updatedAt", LocalDateTime.of(2023, 5, 28, 8, 45, 10, 0))
     }
@@ -147,7 +147,7 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/roles/role-1", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.put("/roles/role_1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -179,12 +179,12 @@ internal class RoleRestControllerIT : BasicIT() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
-        val roleDto = NewRoleDto("Role 2", "role-2")
+        val roleDto = NewRoleDto("Role 2", "role_2")
         // when
         val requestEntity = HttpEntity(roleDto)
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java) },
+                { restApiTemplate.exchange("/roles/role_1", HttpMethod.PUT, requestEntity, RoleDto::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -220,12 +220,12 @@ internal class RoleRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(roleDto)
         val role: ResponseEntity<RoleDto> =
-            restApiTemplate.exchange("/roles/role-1", HttpMethod.PUT, requestEntity, RoleDto::class.java)
+            restApiTemplate.exchange("/roles/role_1", HttpMethod.PUT, requestEntity, RoleDto::class.java)
         // then
         assertNotNull(role)
         assertEquals(HttpStatus.OK, role.statusCode)
         Assertions.assertThat(role.body)
-            .hasFieldOrPropertyWithValue("name", roleName)
+            .hasFieldOrPropertyWithValue("name", roleName.uppercase())
             .hasFieldOrPropertyWithValue("slug", expectedRoleSlug)
             .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 28, 7, 34, 0, 0))
             .hasFieldOrPropertyWithValue("updatedAt", localDateTime)
@@ -271,7 +271,7 @@ internal class RoleRestControllerIT : BasicIT() {
             return Stream.of(
                 Arguments.of("NewRoleName", null, "newrolename"),
                 Arguments.of("NewRoleName", "new-role-name", "new-role-name"),
-                Arguments.of("Role 2", null, "role-21"),
+                Arguments.of("Role 2", null, "role_21"),
             )
         }
     }

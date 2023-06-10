@@ -81,7 +81,7 @@ class EventServiceTest {
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         whenever(repository.findBySlug(any())).thenReturn(null)
         whenever(repository.existsBySlug(any())).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("event-3")
+        whenever(stringUtils.slug(any(), any())).thenReturn("event-3")
         val event = NewEvent(name = "Event 3", sender = Sender(null, null, 1L))
         // when
         service.create(event)
@@ -104,7 +104,7 @@ class EventServiceTest {
         whenever(repository.existsBySlug("event")).thenReturn(true)
         whenever(repository.existsBySlug("event1")).thenReturn(true)
         whenever(repository.existsBySlug("event2")).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("event")
+        whenever(stringUtils.slug(any(), any())).thenReturn("event")
         val event = NewEvent(name = "Event", sender = Sender(null, null, 1L))
         // when
         service.create(event)
@@ -178,7 +178,7 @@ class EventServiceTest {
         val eventToUpdate = NewEvent(name = "Event After Update", sender = Sender(null, null, 1L))
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(false)
-        whenever(stringUtils.slug(any())).thenReturn("event-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("event-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getEvent(
                 name = "event 1",
@@ -249,7 +249,7 @@ class EventServiceTest {
         val eventToUpdate = NewEvent(name = "Event After Update", sender = Sender(null, null, 1L))
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime.plusDays(1))
         whenever(repository.existsBySlug(any())).thenReturn(true, true, false)
-        whenever(stringUtils.slug(any())).thenReturn("event-after-update")
+        whenever(stringUtils.slug(any(), any())).thenReturn("event-after-update")
         whenever(repository.findBySlug(currentSlug)).thenReturn(
             getEvent(
                 name = "event 1",

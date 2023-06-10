@@ -15,8 +15,8 @@ class StringUtilsImpl : StringUtils {
     private val EDGESDHASHES = Pattern.compile("(^-|-$)")
 
     override fun randomAlphanumeric(count: Int): String = RandomStringUtils.randomAlphanumeric(count)
-    override fun slug(slug: String): String {
-        val nowhitespace = WHITESPACE.matcher(slug).replaceAll("-")
+    override fun slug(slug: String, replacement: String?): String {
+        val nowhitespace = WHITESPACE.matcher(slug).replaceAll(replacement)
         val normalized: String = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD)
         var newSlug = NONLATIN.matcher(normalized).replaceAll("")
         newSlug = EDGESDHASHES.matcher(newSlug).replaceAll("")

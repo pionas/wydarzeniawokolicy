@@ -27,10 +27,6 @@ class BasicIT {
     @Autowired
     lateinit var restApiTemplate: TestRestTemplate
 
-    @Qualifier("restTemplate")
-    @Autowired
-    lateinit var restTemplate: TestRestTemplate
-
     @Qualifier("authorizedRestTemplate")
     @Autowired
     lateinit var authorizedRestTemplate: TestRestTemplate

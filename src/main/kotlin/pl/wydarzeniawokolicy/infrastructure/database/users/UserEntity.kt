@@ -15,17 +15,16 @@ data class UserEntity(
     var email: String,
     var password: String,
     var salt: String,
-    var createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime?,
-    var deletedAt: LocalDateTime?
-) {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "users_roles",
         joinColumns = [JoinColumn(name = "user_id")],
-        inverseJoinColumns = [JoinColumn(name = "role_id")]
-    )
-    val roles: Set<RoleEntity> = emptySet()
+        inverseJoinColumns = [JoinColumn(name = "role_slug")]
+    ) var roles: Set<RoleEntity> = emptySet(),
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime?,
+    var deletedAt: LocalDateTime?
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

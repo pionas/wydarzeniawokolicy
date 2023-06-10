@@ -1,0 +1,1 @@
+INSERT INTO users_roles (user_id, role_slug, created_at) VALUES (1, 'admin', '2023-06-09 14:48:00');
