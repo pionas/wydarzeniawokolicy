@@ -8,6 +8,7 @@ import com.vaadin.flow.component.textfield.TextField
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
 import pl.wydarzeniawokolicy.BasicIT
 import pl.wydarzeniawokolicy.domain.categories.api.Category
 import pl.wydarzeniawokolicy.web.category.CategoryView
@@ -18,14 +19,14 @@ class CategoryViewTest : BasicIT() {
     lateinit var categoryView: CategoryView
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql(scripts = ["/db/categories.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun showList() {
         val grid = categoryView._get<Grid<Category>>()
         grid.expectRows(3)
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql(scripts = ["/db/categories.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun filterCategoryList() {
         val filterCategoryTextField = categoryView._get<TextField> {
             placeholder = "Filter by name..."
@@ -37,7 +38,7 @@ class CategoryViewTest : BasicIT() {
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql(scripts = ["/db/categories.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun showCategoryForm() {
         val categoryCreateButton = categoryView._get<Button>() {
             text = "Add category"

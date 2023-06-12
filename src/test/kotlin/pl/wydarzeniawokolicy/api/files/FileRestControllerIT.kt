@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.*
 import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
 import org.springframework.util.FileSystemUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.HttpClientErrorException
@@ -53,7 +54,7 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/files.sql")
+    @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnFileList() {
         // given
         // when
@@ -104,7 +105,7 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/files.sql")
+    @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldCreate() {
         // given
         val request = getMultipartFile("files/forest-1000x1000.jpg")
@@ -120,7 +121,7 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/files.sql")
+    @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnFileDetailsByHash() {
         // given
         // when
@@ -150,7 +151,7 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/files.sql")
+    @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnExistFileByHash() {
         // given
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
@@ -167,7 +168,7 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/files.sql")
+    @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldDelete() {
         // given
         // when

@@ -7,6 +7,7 @@ import com.vaadin.flow.component.virtuallist.VirtualList
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
 import pl.wydarzeniawokolicy.BasicIT
 import pl.wydarzeniawokolicy.domain.events.api.Event
 import kotlin.test.assertEquals
@@ -18,7 +19,7 @@ class WelcomeViewTest : BasicIT() {
     lateinit var welcomeView: WelcomeView
 
     @Test
-    @Sql("/db/events.sql")
+    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun showWelcomeView() {
         val mapImplementsText = welcomeView._get<Text>()
         assertEquals("TODO: Implements map", mapImplementsText.text)

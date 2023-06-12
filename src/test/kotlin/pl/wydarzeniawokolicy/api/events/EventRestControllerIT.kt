@@ -183,7 +183,7 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/events.sql")
+    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButEventSlugExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -227,7 +227,7 @@ internal class EventRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideEventsDtoValidList")
-    @Sql("/db/events.sql")
+    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldUpdate(eventName: String, eventSlug: String?, expectedEventSlug: String) {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 27, 8, 55, 0, 0)
@@ -248,7 +248,7 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/events.sql")
+    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldDelete() {
         // given
         // when

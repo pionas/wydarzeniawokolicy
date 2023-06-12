@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
 import org.springframework.web.client.HttpClientErrorException
 import pl.wydarzeniawokolicy.BasicIT
 import pl.wydarzeniawokolicy.infrastructure.database.roles.RoleEntity
@@ -36,7 +37,7 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/roles.sql")
+    @Sql(scripts = ["/db/roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnRoleList() {
         // given
         // when
@@ -94,7 +95,7 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/roles.sql")
+    @Sql(scripts = ["/db/roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -112,7 +113,7 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/roles.sql")
+    @Sql(scripts = ["/db/roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnRoleDetailsById() {
         // given
         // when
@@ -174,7 +175,7 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/roles.sql")
+    @Sql(scripts = ["/db/roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButRoleSlugExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -211,7 +212,7 @@ internal class RoleRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideRoleDtoValidList")
-    @Sql("/db/roles.sql")
+    @Sql(scripts = ["/db/roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldUpdate(roleName: String, roleSlug: String?, expectedRoleSlug: String) {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 28, 7, 48, 0, 0)
@@ -232,7 +233,7 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/roles.sql")
+    @Sql(scripts = ["/db/roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldDelete() {
         // given
         // when

@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
 import org.springframework.web.client.HttpClientErrorException
 import pl.wydarzeniawokolicy.BasicIT
 import pl.wydarzeniawokolicy.infrastructure.database.categories.CategoryEntity
@@ -57,7 +58,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql(scripts = ["/db/categories.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnCategoryList() {
         // given
         // when
@@ -102,7 +103,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnInternalServerErrorWhenTryCreate() {
         // given
         // when
@@ -117,7 +118,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryCreate() {
         // given
         val categoryDto = NewCategoryDto("", null)
@@ -133,7 +134,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -151,7 +152,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/categories.sql")
+    @Sql(scripts = ["/db/categories.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnCategoryDetailsById() {
         // given
         // when
@@ -181,7 +182,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnInternalServerErrorWhenTryUpdate() {
         // given
         // when
@@ -196,7 +197,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnNotFoundWhenTryUpdateByCategoryNotExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -222,7 +223,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/categories.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/categories.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButCategorySlugExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -249,7 +250,7 @@ internal class CategoryRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideCategoryDtoList")
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdate(categoryName: String?, categorySlug: String?, message: String) {
         // given
         val categoryDto = NewCategoryDto(categoryName, categorySlug)
@@ -267,7 +268,7 @@ internal class CategoryRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideCategoryDtoValidList")
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldUpdate(categoryName: String, categorySlug: String?, expectedCategorySlug: String) {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 25, 19, 57, 0, 0)
@@ -288,7 +289,7 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldDelete() {
         // given
         // when

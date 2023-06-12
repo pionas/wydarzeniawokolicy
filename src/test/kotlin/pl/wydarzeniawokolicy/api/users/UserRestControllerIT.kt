@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
 import org.springframework.web.client.HttpClientErrorException
 import pl.wydarzeniawokolicy.BasicIT
 import java.time.LocalDateTime
@@ -36,7 +37,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnUserList() {
         // given
         // when
@@ -97,7 +98,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -116,7 +117,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnUserDetailsById() {
         // given
         // when
@@ -185,7 +186,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButUserByEmailExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -211,7 +212,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButUserByNameExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -238,7 +239,7 @@ internal class UserRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideUserDtoList")
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdate(
         name: String,
         email: String,
@@ -269,7 +270,7 @@ internal class UserRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideUserDtoValidList")
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldUpdate(
         name: String,
         email: String,
@@ -302,7 +303,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql("/db/users.sql")
+    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldDelete() {
         // given
         // when
