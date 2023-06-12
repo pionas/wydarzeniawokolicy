@@ -23,11 +23,11 @@ class NewEvent(
 )
 
 class Address(
-    var country: String?,
-    var voivodeship: String?,
-    var city: String?,
-    var street: String?,
-    var apartment: String?
+    var country: String? = null,
+    var voivodeship: String? = null,
+    var city: String? = null,
+    var street: String? = null,
+    var apartment: String? = null
 ) {
     constructor(addressEmbeddable: AddressEmbeddable) : this(
         country = addressEmbeddable.country,
@@ -38,7 +38,7 @@ class Address(
     )
 }
 
-class GeoLocation(var coordinatesLatitude: Float?, var coordinatesLongitude: Float?) {
+class GeoLocation(var coordinatesLatitude: Float? = null, var coordinatesLongitude: Float? = null) {
     constructor(geoLocationEmbeddable: GeoLocationEmbeddable) : this(
         coordinatesLatitude = geoLocationEmbeddable.coordinatesLatitude,
         coordinatesLongitude = geoLocationEmbeddable.coordinatesLongitude

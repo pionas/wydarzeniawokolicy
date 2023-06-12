@@ -2,7 +2,6 @@ package pl.wydarzeniawokolicy.api.events
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -21,21 +20,10 @@ import pl.wydarzeniawokolicy.infrastructure.database.events.EventEntity
 import java.time.LocalDateTime
 import java.util.stream.Stream
 
-
 internal class EventRestControllerIT : BasicIT() {
 
-    @Test
-    @Disabled
-    fun shouldReturnUnauthorized() {
-        // given
-
-        // when
-        val result = restApiTemplate.getForEntity("/events", List::class.java)
-
-        // then
-        assertNotNull(result)
-        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
-    }
+    private val EVENTS_URI: String = "/events"
+    private val EVENTS_DETAILS_URI: String = "/events/%s"
 
     @Test
     @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
@@ -43,7 +31,7 @@ internal class EventRestControllerIT : BasicIT() {
         // given
         // when
         val result: ResponseEntity<List<EventDto>> = restApiTemplate.exchange(
-            "/events",
+            EVENTS_URI,
             HttpMethod.GET,
             null,
             object : ParameterizedTypeReference<List<EventDto>>() {})
@@ -67,12 +55,44 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
+    fun shouldReturnUnauthorizedWhenTryCreateCategory() {
+        // given
+        val eventDto = getEventDto("Event 1", "event-1")
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { forbiddenRestTemplate.postForEntity(EVENTS_URI, eventDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+    }
+
+    @Test
+    fun shouldReturnWrongPasswordWhenTryCreateCategory() {
+        // given
+        val eventDto = getEventDto("Event 1", "event-1")
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { wrongPasswordRestTemplate.postForEntity(EVENTS_URI, eventDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+    }
+
+    @Test
     fun shouldReturnInternalServerErrorWhenTryCreate() {
         // given
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.postForEntity("/events", HashMap<String, Any>(), Any::class.java) },
+                { restApiTemplate.postForEntity(EVENTS_URI, HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -81,13 +101,14 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryCreate() {
         // given
         val eventDto = NewEventDto("", null)
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.postForEntity("/events", eventDto, Any::class.java) },
+                { authorizedRestTemplate.postForEntity(EVENTS_URI, eventDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -96,20 +117,60 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
-    fun shouldCreate() {
+    @Sql(
+        scripts = ["/db/events.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
+    fun shouldCreateByAdmin() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
-        val eventDto = NewEventDto("Event 1", "event-1")
+        val eventDto = getEventDto(
+            name = "Event 1",
+            slug = "event-1",
+            description = "description",
+            content = "content",
+            online = true,
+            website = "http://localhost",
+            ticketWebsite = "https://ticket.localhost",
+            promo = true,
+            address = AddressDto("Country", "Voivodeship", "City", "Street", "Apartment"),
+            active = true,
+            location = GeoLocationDto(52.231903F, 21.006016F),
+        )
         // when
-        val event = restApiTemplate.postForEntity("/events", eventDto, EventDto::class.java)
+        val event = authorizedRestTemplate.postForEntity(EVENTS_URI, eventDto, EventDto::class.java)
         // then
         assertNotNull(event)
         assertEquals(HttpStatus.CREATED, event?.statusCode)
         Assertions.assertThat(event.body)
             .hasFieldOrPropertyWithValue("name", eventDto.name)
             .hasFieldOrPropertyWithValue("slug", eventDto.slug)
+            .hasFieldOrPropertyWithValue("sender.name", null)
+            .hasFieldOrPropertyWithValue("sender.email", null)
+            .hasFieldOrPropertyWithValue("sender.userId", 1L)
+            .hasFieldOrPropertyWithValue("createdAt", localDateTime)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldCreateByGuest() {
+        // given
+        val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        val eventDto =
+            getEventDto(name = "Event 1", slug = "event-1", guestName = "John Doe", guestEmail = "john.doe@example.com")
+        // when
+        val event = restApiTemplate.postForEntity(EVENTS_URI, eventDto, EventDto::class.java)
+        // then
+        assertNotNull(event)
+        assertEquals(HttpStatus.CREATED, event?.statusCode)
+        Assertions.assertThat(event.body)
+            .hasFieldOrPropertyWithValue("name", eventDto.name)
+            .hasFieldOrPropertyWithValue("slug", eventDto.slug)
+            .hasFieldOrPropertyWithValue("sender.name", eventDto.guestName)
+            .hasFieldOrPropertyWithValue("sender.email", eventDto.guestEmail)
+            .hasFieldOrPropertyWithValue("sender.userId", null)
             .hasFieldOrPropertyWithValue("createdAt", localDateTime)
     }
 
@@ -118,7 +179,10 @@ internal class EventRestControllerIT : BasicIT() {
     fun shouldReturnEventDetailsById() {
         // given
         // when
-        val result = restApiTemplate.getForEntity("/events/kopernik-i-jego-swiat", EventDto::class.java)
+        val result = restApiTemplate.getForEntity(
+            String.format(EVENTS_DETAILS_URI, "kopernik-i-jego-swiat"),
+            EventDto::class.java,
+        )
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -135,7 +199,7 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.getForEntity("/events/100", Object::class.java) },
+                { restApiTemplate.getForEntity(String.format(EVENTS_DETAILS_URI, "100"), Object::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -144,12 +208,19 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnInternalServerErrorWhenTryUpdate() {
         // given
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/events/event-1", HashMap<String, Any>(), Any::class.java) },
+                {
+                    authorizedRestTemplate.put(
+                        String.format(EVENTS_DETAILS_URI, "event-1"),
+                        HashMap<String, Any>(),
+                        Any::class.java
+                    )
+                },
                 HttpClientErrorException::class.java
             )
         // then
@@ -158,21 +229,22 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnNotFoundWhenTryUpdateByEventNotExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
-        val eventDto = NewEventDto("Event 1", "event-1")
+        val eventDto = getEventDto("Event 1", "event-1")
         // when
         val requestEntity = HttpEntity(eventDto)
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
-                        "/events/event-not-exist",
+                    authorizedRestTemplate.exchange(
+                        String.format(EVENTS_DETAILS_URI, "event-not-exist"),
                         HttpMethod.PUT,
                         requestEntity,
-                        NewEventDto::class.java
+                        NewEventDto::class.java,
                     )
                 },
                 HttpClientErrorException::class.java
@@ -183,7 +255,10 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/events.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldReturnBadRequestWhenTryUpdateButEventSlugExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -194,8 +269,8 @@ internal class EventRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
-                        "/events/pajaki-i-skorpiony",
+                    authorizedRestTemplate.exchange(
+                        String.format(EVENTS_DETAILS_URI, "pajaki-i-skorpiony"),
                         HttpMethod.PUT,
                         requestEntity,
                         NewEventDto::class.java
@@ -210,13 +285,20 @@ internal class EventRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideEventDtoList")
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdate(eventName: String, eventSlug: String?, message: String) {
         // given
         val eventDto = NewEventDto(eventName, eventSlug)
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/events/pajaki-i-skorpiony", eventDto, Any::class.java) },
+                {
+                    authorizedRestTemplate.put(
+                        String.format(EVENTS_DETAILS_URI, "pajaki-i-skorpiony"),
+                        eventDto,
+                        Any::class.java
+                    )
+                },
                 HttpClientErrorException::class.java
             )
         // then
@@ -227,7 +309,10 @@ internal class EventRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideEventsDtoValidList")
-    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/events.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldUpdate(eventName: String, eventSlug: String?, expectedEventSlug: String) {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 27, 8, 55, 0, 0)
@@ -236,7 +321,12 @@ internal class EventRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(eventDto)
         val event: ResponseEntity<EventDto> =
-            restApiTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.PUT, requestEntity, EventDto::class.java)
+            authorizedRestTemplate.exchange(
+                String.format(EVENTS_DETAILS_URI, "pajaki-i-skorpiony"),
+                HttpMethod.PUT,
+                requestEntity,
+                EventDto::class.java
+            )
         // then
         assertNotNull(event)
         assertEquals(HttpStatus.OK, event.statusCode)
@@ -248,15 +338,38 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/events.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/events.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldDelete() {
         // given
         // when
-        val result = restApiTemplate.exchange("/events/pajaki-i-skorpiony", HttpMethod.DELETE, null, Any::class.java)
+        val result = authorizedRestTemplate.exchange(
+            String.format(EVENTS_DETAILS_URI, "pajaki-i-skorpiony"),
+            HttpMethod.DELETE,
+            null,
+            Any::class.java
+        )
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val entity = dbUtils.em().find(EventEntity::class.java, "pajaki-i-skorpiony")
         assertNull(entity)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnNotFoundWhenTryDeleteByEventNotExist() {
+        // given
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { restApiTemplate.getForEntity(String.format(EVENTS_DETAILS_URI, "100"), Object::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.NOT_FOUND, result?.statusCode)
     }
 
     companion object {
@@ -287,4 +400,35 @@ internal class EventRestControllerIT : BasicIT() {
             )
         }
     }
+
+    private fun getEventDto(
+        name: String,
+        slug: String,
+        description: String? = null,
+        content: String? = null,
+        online: Boolean = false,
+        website: String? = null,
+        ticketWebsite: String? = null,
+        promo: Boolean = false,
+        active: Boolean = false,
+        address: AddressDto? = null,
+        location: GeoLocationDto? = null,
+        guestName: String? = null,
+        guestEmail: String? = null,
+    ) =
+        NewEventDto(
+            name = name,
+            slug = slug,
+            description = description,
+            content = content,
+            online = online,
+            website = website,
+            ticketWebsite = ticketWebsite,
+            promo = promo,
+            active = active,
+            address = address,
+            location = location,
+            guestName = guestName,
+            guestEmail = guestEmail
+        )
 }

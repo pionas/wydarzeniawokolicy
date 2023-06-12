@@ -3,9 +3,6 @@ package pl.wydarzeniawokolicy.api.events
 import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
-import pl.wydarzeniawokolicy.domain.events.api.Address
-import pl.wydarzeniawokolicy.domain.events.api.GeoLocation
-import pl.wydarzeniawokolicy.domain.events.api.Sender
 import java.time.LocalDateTime
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -21,7 +18,7 @@ data class EventDto(
     var active: Boolean,
     var address: AddressDto?,
     var location: GeoLocationDto?,
-    var sender: Sender,
+    var sender: SenderDto,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
     val deletedAt: LocalDateTime?
@@ -38,8 +35,10 @@ data class NewEventDto(
     var ticketWebsite: String? = null,
     var promo: Boolean = false,
     var active: Boolean = false,
-    var address: Address? = null,
-    var location: GeoLocation? = null
+    var address: AddressDto? = null,
+    var location: GeoLocationDto? = null,
+    var guestName: String? = null,
+    var guestEmail: String? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

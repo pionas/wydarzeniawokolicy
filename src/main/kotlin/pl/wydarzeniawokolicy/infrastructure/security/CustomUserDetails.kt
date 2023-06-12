@@ -7,6 +7,7 @@ import pl.wydarzeniawokolicy.domain.users.api.User
 
 class CustomUserDetails(val user: User) : UserDetails {
 
+    fun getId() = user.id
     fun getSalt() = user.salt
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
