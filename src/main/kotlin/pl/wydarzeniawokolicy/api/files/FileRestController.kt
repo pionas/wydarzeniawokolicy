@@ -3,6 +3,7 @@ package pl.wydarzeniawokolicy.api.files
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import pl.wydarzeniawokolicy.domain.files.api.FileService
@@ -14,10 +15,10 @@ class FileRestController(
     private val mapper: FileMapper,
 ) {
 
-    @GetMapping("")
+    @GetMapping
     fun getAll(): List<FileDto> = mapper.mapToDto(service.findAll())
 
-    @PostMapping("")
+    @PostMapping
     fun uploadFile(@Valid @RequestParam("file") file: MultipartFile): ResponseEntity<FileDto> {
         val createdUser = service.create(file)
         return ResponseEntity(mapper.mapToDto(createdUser), HttpStatus.CREATED)
@@ -29,7 +30,8 @@ class FileRestController(
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") hash: String): ResponseEntity<Void> {
+    @PreAuthorize("hasAnyRole('FILE_MANAGEMENT','ADMIN','FILE_DELETE')")
+    fun delete(@PathVariable("id") hash: String): ResponseEntity<Unit> {
         service.deleteByHash(hash)
         return ResponseEntity(HttpStatus.OK)
     }

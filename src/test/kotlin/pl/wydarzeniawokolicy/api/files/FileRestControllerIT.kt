@@ -41,19 +41,6 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Disabled
-    fun shouldReturnUnauthorized() {
-        // given
-
-        // when
-        val result = restApiTemplate.getForEntity("/files", List::class.java)
-
-        // then
-        assertNotNull(result)
-        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
-    }
-
-    @Test
     @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnFileList() {
         // given
@@ -91,6 +78,38 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
+    fun shouldReturnUnauthorizedWhenTryUploadFile() {
+        // given
+        val request = getMultipartFile("files/forest-1000x1000.jpg")
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { forbiddenRestTemplate.postForEntity("/files", request, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+    }
+
+    @Test
+    fun shouldReturnWrongPasswordWhenTryUploadFile() {
+        // given
+        val request = getMultipartFile("files/forest-1000x1000.jpg")
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { wrongPasswordRestTemplate.postForEntity("/files", request, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+    }
+
+    @Test
     fun shouldReturnInternalServerErrorWhenTryCreate() {
         // given
         // when
@@ -106,7 +125,7 @@ internal class FileRestControllerIT : BasicIT() {
 
     @Test
     @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
-    fun shouldCreate() {
+    fun shouldCreateByGuest() {
         // given
         val request = getMultipartFile("files/forest-1000x1000.jpg")
         // when
@@ -121,11 +140,43 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/files.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldCreateByAdmin() {
+        // given
+        val request = getMultipartFile("files/forest-1000x1000.jpg")
+        // when
+        val file = authorizedRestTemplate.postForEntity("/files", request, FileDto::class.java)
+        // then
+        assertNotNull(file)
+        assertEquals(HttpStatus.CREATED, file?.statusCode)
+        Assertions.assertThat(file.body)
+            .hasFieldOrPropertyWithValue("hash", "d2a9332290d027cee71409735cedaae8")
+            .hasFieldOrPropertyWithValue("name", "forest-1000x1000.jpg")
+            .hasFieldOrPropertyWithValue("createdAt", localDateTime)
+    }
+
+    @Test
     @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
-    fun shouldReturnFileDetailsByHash() {
+    fun shouldReturnFileDetailsByHashByGuest() {
         // given
         // when
         val result = restApiTemplate.getForEntity("/files/hash1", FileDto::class.java)
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.OK, result?.statusCode)
+        Assertions.assertThat(result.body!!)
+            .hasFieldOrPropertyWithValue("hash", "hash1")
+            .hasFieldOrPropertyWithValue("name", "name1")
+            .hasFieldOrPropertyWithValue("path", "path1")
+            .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 24, 16, 39, 0, 0))
+    }
+
+    @Test
+    @Sql(scripts = ["/db/files.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnFileDetailsByHashByAdmin() {
+        // given
+        // when
+        val result = authorizedRestTemplate.getForEntity("/files/hash1", FileDto::class.java)
         // then
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result?.statusCode)
@@ -152,7 +203,7 @@ internal class FileRestControllerIT : BasicIT() {
 
     @Test
     @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
-    fun shouldReturnExistFileByHash() {
+    fun shouldReturnExistFileByHashAndUploadByGuest() {
         // given
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
         val fileToUpload = getMultipartFile("files/mac-1000x1000.jpg")
@@ -168,11 +219,43 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/files.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnExistFileByHashAndUploadByAdmin() {
+        // given
+        whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
+        val fileToUpload = getMultipartFile("files/mac-1000x1000.jpg")
+        // when
+        val file = authorizedRestTemplate.postForEntity("/files", fileToUpload, FileDto::class.java)
+        // then
+        assertNotNull(file)
+        assertEquals(HttpStatus.CREATED, file?.statusCode)
+        Assertions.assertThat(file.body)
+            .hasFieldOrPropertyWithValue("hash", "7eba8b1c1ebc38e45c658354eace01de")
+            .hasFieldOrPropertyWithValue("name", "name4")
+            .hasFieldOrPropertyWithValue("createdAt", LocalDateTime.of(2023, 5, 24, 16, 39, 30, 0))
+    }
+
+    @Test
     @Sql(scripts = ["/db/files.sql"], config = SqlConfig(encoding = "UTF-8"))
-    fun shouldDelete() {
+    fun shouldDeleteByGuest() {
         // given
         // when
-        val result = restApiTemplate.exchange("/files/hash1", HttpMethod.DELETE, null, Any::class.java)
+        val result =
+            Assertions.catchThrowableOfType(
+                { restApiTemplate.exchange("/files/hash1", HttpMethod.DELETE, null, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/files.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldDeleteByAdmin() {
+        // given
+        // when
+        val result = authorizedRestTemplate.exchange("/files/hash1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
         val fileEntity = dbUtils.em().find(FileEntity::class.java, "hash1")
