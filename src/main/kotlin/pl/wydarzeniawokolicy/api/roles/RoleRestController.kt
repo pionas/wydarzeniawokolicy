@@ -3,6 +3,7 @@ package pl.wydarzeniawokolicy.api.roles
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import pl.wydarzeniawokolicy.domain.roles.api.RoleService
 
@@ -13,10 +14,11 @@ class RoleRestController(
     private val mapper: RoleMapper,
 ) {
 
-    @GetMapping("")
+    @GetMapping
     fun getAll(): List<RoleDto> = mapper.mapToDto(service.findAll())
 
-    @PostMapping("")
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ROLE_MANAGEMENT','ADMIN')")
     fun create(@Valid @RequestBody role: NewRoleDto): ResponseEntity<RoleDto> {
         val createdRole = service.create(mapper.mapToDomain(role))
         return ResponseEntity(mapper.mapToDto(createdRole), HttpStatus.CREATED)
@@ -28,12 +30,14 @@ class RoleRestController(
     }
 
     @PutMapping("/{slug}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGEMENT','ADMIN')")
     fun update(@PathVariable("slug") slug: String, @Valid @RequestBody roleDto: NewRoleDto): ResponseEntity<RoleDto> {
         val createdRole = service.update(slug, mapper.mapToDomain(roleDto))
         return ResponseEntity(mapper.mapToDto(createdRole), HttpStatus.OK)
     }
 
     @DeleteMapping("/{slug}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGEMENT','ADMIN')")
     fun delete(@PathVariable("slug") slug: String): ResponseEntity<Void> {
         service.delete(slug)
         return ResponseEntity(HttpStatus.OK)
