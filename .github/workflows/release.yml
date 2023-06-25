@@ -50,18 +50,18 @@ jobs:
         uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ secrets.TOKEN }}
-#      - name: Create tag
-#        uses: actions/github-script@v6
-#        with:
-#          github-token: ${{ secrets.TOKEN }}
-#          script: |
-#            github.rest.git.createRef({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              sha: context.sha,
-#              ref: "refs/tags/${{ env.APP_VERSION }}",
-#            })
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              ref: "refs/tags/${{ env.APP_VERSION }}",
+            })
       - uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
