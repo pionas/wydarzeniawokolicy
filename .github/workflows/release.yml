@@ -52,6 +52,17 @@ jobs:
         with:
           name: artifact
           path: build/libs/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/release/WydarzeniaWOkolicy/v${{ github.event.inputs.version }}-RC${{ github.event.inputs.candidate }}",
+              sha: context.sha
+            })
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
