@@ -78,13 +78,13 @@ internal class FileRestControllerIT : BasicIT() {
     }
 
     @Test
-    fun shouldReturnUnauthorizedWhenTryUploadFile() {
+    fun shouldReturnUnauthorizedWhenUserNotExistAndTryUploadFile() {
         // given
         val request = getMultipartFile("files/forest-1000x1000.jpg")
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { forbiddenRestTemplate.postForEntity("/files", request, Any::class.java) },
+                { authorizedRestTemplate.postForEntity("/files", request, Any::class.java) },
                 HttpClientErrorException::class.java
             )
 

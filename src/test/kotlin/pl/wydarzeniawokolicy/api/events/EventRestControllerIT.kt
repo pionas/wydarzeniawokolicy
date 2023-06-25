@@ -55,13 +55,13 @@ internal class EventRestControllerIT : BasicIT() {
     }
 
     @Test
-    fun shouldReturnUnauthorizedWhenTryCreateCategory() {
+    fun shouldReturnUnauthorizedWhenUserNotExistAndTryUploadFile() {
         // given
         val eventDto = getEventDto("Event 1", "event-1")
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { forbiddenRestTemplate.postForEntity(EVENTS_URI, eventDto, Any::class.java) },
+                { authorizedRestTemplate.postForEntity(EVENTS_URI, eventDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
 

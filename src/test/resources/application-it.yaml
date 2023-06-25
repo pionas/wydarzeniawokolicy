@@ -32,6 +32,9 @@ users:
   valid:
     username: john.doe
     password: validPassword
+  forbidden:
+    username: anna.doe
+    password: validPassword
   invalid:
     username: user
     password: userpass

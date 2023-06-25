@@ -2,7 +2,6 @@ package pl.wydarzeniawokolicy.api.categories
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -26,19 +25,19 @@ import java.util.stream.Stream
 internal class CategoryRestControllerIT : BasicIT() {
 
     @Test
-    fun shouldReturnUnauthorizedWhenTryCreateCategory() {
+    fun shouldReturnForbiddenWhenIsAnonymous() {
         // given
         val categoryDto = NewCategoryDto("dsa", null)
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { forbiddenRestTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
+                { restApiTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
 
         // then
         assertNotNull(result)
-        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
     }
 
     @Test
@@ -87,13 +86,14 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnForbiddenWhenTryCreateCategory() {
         // given
         val categoryDto = NewCategoryDto("dsa", null)
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
+                { forbiddenRestTemplate.postForEntity("/categories", categoryDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
 
@@ -134,7 +134,10 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -223,7 +226,10 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/categories.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/categories.sql", "/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldReturnBadRequestWhenTryUpdateButCategorySlugExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -268,7 +274,10 @@ internal class CategoryRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideCategoryDtoValidList")
-    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldUpdate(categoryName: String, categorySlug: String?, expectedCategorySlug: String) {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 25, 19, 57, 0, 0)
@@ -277,7 +286,12 @@ internal class CategoryRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(categoryDto)
         val category: ResponseEntity<CategoryDto> =
-            authorizedRestTemplate.exchange("/categories/category-1", HttpMethod.PUT, requestEntity, CategoryDto::class.java)
+            authorizedRestTemplate.exchange(
+                "/categories/category-1",
+                HttpMethod.PUT,
+                requestEntity,
+                CategoryDto::class.java
+            )
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.OK, category.statusCode)
@@ -289,7 +303,10 @@ internal class CategoryRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(
+        scripts = ["/db/users.sql", "/db/roles.sql", "/db/categories.sql", "/db/users_roles.sql"],
+        config = SqlConfig(encoding = "UTF-8")
+    )
     fun shouldDelete() {
         // given
         // when

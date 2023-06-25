@@ -29,8 +29,8 @@ class RestITConfig {
 
     @Bean
     fun forbiddenRestTemplate(
-        @Value("\${users.invalid.username}") username: String,
-        @Value("\${users.invalid.password}") password: String
+        @Value("\${users.forbidden.username}") username: String,
+        @Value("\${users.forbidden.password}") password: String
     ): TestRestTemplate {
         return buildRestTemplate(username, password, ROOT_API_URI)
     }

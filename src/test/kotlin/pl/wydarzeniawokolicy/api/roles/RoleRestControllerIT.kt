@@ -52,19 +52,36 @@ internal class RoleRestControllerIT : BasicIT() {
     }
 
     @Test
-    fun shouldReturnUnauthorized() {
+    fun shouldReturnForbiddenWhenIsAnonymous() {
         // given
-
+        val roleDto = NewRoleDto("NewRoleDto", null)
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { forbiddenRestTemplate.getForEntity("/roles", List::class.java) },
+                { restApiTemplate.postForEntity("/roles", roleDto, List::class.java) },
                 HttpClientErrorException::class.java
             )
 
         // then
         assertNotNull(result)
-        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnForbidden() {
+        // given
+        val roleDto = NewRoleDto("NewRoleDto", null)
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { forbiddenRestTemplate.postForEntity("/roles", roleDto, List::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
     }
 
     @Test
