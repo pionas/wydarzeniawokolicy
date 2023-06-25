@@ -64,6 +64,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.TOKEN }}
+          fetch_all_tags: true
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,
