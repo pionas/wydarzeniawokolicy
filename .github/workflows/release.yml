@@ -52,7 +52,6 @@ jobs:
         with:
           name: artifact
           path: build/libs/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar
-
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
