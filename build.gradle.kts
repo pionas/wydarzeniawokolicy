@@ -1,4 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.yaml.snakeyaml.Yaml
+
+buildscript {
+    dependencies {
+        classpath("org.yaml:snakeyaml:2.0")
+    }
+}
 
 plugins {
     id("org.springframework.boot") version "3.0.7"
@@ -11,8 +18,10 @@ plugins {
     id("jacoco")
 }
 
+initAppProperties()
 group = "pl.wydarzeniawokolicy"
-version = "0.0.1-SNAPSHOT"
+version = extra["appVersion"]!!
+
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 configurations {
@@ -74,4 +83,16 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
+}
+
+fun initAppProperties() {
+    fun getAppDetails(): Map<String, String> {
+        val yaml = Yaml()
+        val file = File("src/main/resources/application.yaml")
+        val data = yaml.load<Map<String, Any>>(file.inputStream())
+        return (data["info"] as Map<*, *>).get("app") as Map<String, String>
+    }
+
+    val appName by extra { getAppDetails()["name"] }
+    val appVersion by extra { getAppDetails()["version"] }
 }
