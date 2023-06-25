@@ -37,8 +37,11 @@ jobs:
 #    needs: build-and-test
     name: Generate Jar
     runs-on: ubuntu-latest
-
     steps:
+      - name: Read Application Config
+        run: |
+          echo "APP_NAME=$(grep 'info.app.name' src/main/resources/application.yml | awk -F: '{print $2}' | tr -d ' ')" >> $GITHUB_ENV
+          echo "APP_VERSION=$(grep 'info.app.version' src/main/resources/application.yml | awk -F: '{print $2}' | tr -d ' ')" >> $GITHUB_ENV
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
         with:
@@ -92,4 +95,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             kill -9 $(pgrep -f 'wydarzeniawokolicy')
-            screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar --server.port=$APP_PORT
+            screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar --server.port=${{ secrets.APP_PORT }}
