@@ -74,7 +74,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifact
-          path: build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar,src/main/resources/application.yaml
+          path: |
+            build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
+            src/main/resources/application.yaml
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
