@@ -38,6 +38,10 @@ jobs:
     name: Generate Jar
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.TOKEN }}
       - name: Read Application Config
         run: |
           cd ${{ github.workspace }} & ls -la
@@ -47,10 +51,6 @@ jobs:
         uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ secrets.TOKEN }}
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.TOKEN }}
       - name: Create tag
         uses: actions/github-script@v6
         with:
