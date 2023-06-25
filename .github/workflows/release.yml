@@ -76,4 +76,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: "kill -9 $(pgrep -f 'wydarzeniawokolicy'); screen -d -m -S wydarzeniawokolicy java -jar /www/wydarzeniawokolicy/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar --server.port=$APP_PORT"
+          script: "kill -9 $(pgrep -f 'wydarzeniawokolicy'); screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar --server.port=$APP_PORT"
