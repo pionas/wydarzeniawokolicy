@@ -13,8 +13,6 @@ spring:
   h2:
     console:
       enabled: true
-  application:
-    name: Wydarzenia W Okolicy
 
 flyway:
   user: databaseUser
@@ -28,3 +26,9 @@ vaadin:
 
 category:
   title: Categories
+
+info:
+  app:
+    name: Wydarzenia W Okolicy
+    description: This is my first spring boot application
+    version: 1.0.0

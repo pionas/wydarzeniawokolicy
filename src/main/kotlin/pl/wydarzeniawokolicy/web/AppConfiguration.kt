@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 class AppConfiguration {
 
     @Bean
-    fun appProperties(@Value("\${spring.application.name}") appName: String, categoryProperties: CategoryProperties): AppProperties {
+    fun appProperties(@Value("\${info.app.name}") appName: String, categoryProperties: CategoryProperties): AppProperties {
         return AppProperties(appName, categoryProperties)
     }
 }
