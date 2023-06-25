@@ -44,8 +44,6 @@ jobs:
           token: ${{ secrets.TOKEN }}
       - name: Read Application Config
         run: |
-          sudo apt update
-          sudo install yq
           echo "APP_NAME=$(yq eval '.info.app.name' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
           echo "APP_VERSION=$(yq eval '.info.app.version' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
       - name: Cancel Previous Runs
