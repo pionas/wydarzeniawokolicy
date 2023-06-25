@@ -75,14 +75,6 @@ jobs:
         with:
           name: artifact
           path: build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: ${{ env.APP_VERSION }}
-          prerelease: false
-          files: |
-            LICENSE.txt
-            *.jar
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
