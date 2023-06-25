@@ -70,7 +70,7 @@ jobs:
         run: chmod +x gradlew
       - name: Build PROD with Gradle
         run: ./gradlew clean build -x test -Pvaadin.productionMode
-      - name: Upload JAR
+      - name: Upload package
         uses: actions/upload-artifact@v3
         with:
           name: artifact
@@ -87,14 +87,13 @@ jobs:
         uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ secrets.TOKEN }}
-      - name: Read Application Config
-        run: |
-          echo "APP_NAME=$(yq eval '.info.app.name' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
-          echo "APP_VERSION=$(yq eval '.info.app.version' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
-      - name: Download JAR
+      - name: Download package
         uses: actions/download-artifact@v3
         with:
           name: artifact
+      - name: Read Application Config
+        run: |
+          echo "APP_VERSION=$(yq eval '.info.app.version' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
       - name: Deploy file via ssh password
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -102,7 +101,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "wydarzeniawokolicy-${{ env.APP_VERSION }}.jar"
+          source: "build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar"
           target: www/wydarzeniawokolicy
       - name: run app
         uses: appleboy/ssh-action@v0.1.10
