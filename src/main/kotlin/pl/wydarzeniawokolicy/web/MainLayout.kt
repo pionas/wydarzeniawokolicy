@@ -10,6 +10,7 @@ import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.router.HasDynamicTitle
 import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.theme.lumo.LumoUtility
 import org.springframework.context.annotation.Scope
@@ -26,12 +27,14 @@ class MainLayout(
     private val appProperties: AppProperties,
     private val securityService: SecurityService
 ) :
-    AppLayout() {
+    AppLayout(), HasDynamicTitle {
 
     init {
         createHeader()
         createDrawer()
     }
+
+    override fun getPageTitle(): String = appProperties.appName
 
     private fun createHeader() {
         val logo = H1(appProperties.appName)
