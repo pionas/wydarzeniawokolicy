@@ -94,6 +94,7 @@ jobs:
       - name: Read Application Config
         run: |
           echo "APP_VERSION=$(yq eval '.info.app.version' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
+          cp ./build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar ./wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
       - name: Deploy file via ssh password
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -101,7 +102,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar"
+          source: "wydarzeniawokolicy-${{ env.APP_VERSION }}.jar"
           target: www/wydarzeniawokolicy
       - name: run app
         uses: appleboy/ssh-action@v0.1.10
