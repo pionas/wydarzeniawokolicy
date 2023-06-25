@@ -2,10 +2,11 @@ package pl.wydarzeniawokolicy.api.events
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.ReportingPolicy
 import pl.wydarzeniawokolicy.domain.events.api.Event
 import pl.wydarzeniawokolicy.domain.events.api.NewEvent
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 interface EventMapper {
 
     fun mapToDto(event: Event): EventDto
