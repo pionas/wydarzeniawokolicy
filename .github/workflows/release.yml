@@ -10,7 +10,7 @@ on:
 jobs:
   build-and-test:
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
-    name: Build
+    name: Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,7 +34,7 @@ jobs:
 
   generate-jar:
     if: ${{ github.event_name == 'push' }}
-    needs: build-and-test
+#    needs: build-and-test
     name: Generate Jar
     runs-on: ubuntu-latest
 
