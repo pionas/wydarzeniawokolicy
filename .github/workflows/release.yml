@@ -85,6 +85,10 @@ jobs:
         uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ secrets.TOKEN }}
+      - name: Read Application Config
+        run: |
+          echo "APP_NAME=$(yq eval '.info.app.name' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
+          echo "APP_VERSION=$(yq eval '.info.app.version' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
       - name: Download JAR
         uses: actions/download-artifact@v3
         with:
