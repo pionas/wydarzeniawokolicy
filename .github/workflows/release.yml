@@ -69,6 +69,8 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
+              sha: context.sha,
+              ref: "refs/tags/release/WydarzeniaWOkolicy/v${{ github.event.inputs.version }}-RC${{ github.event.inputs.candidate }}",
               body: '👋 Thanks for reporting!'
             })
   deploy:
