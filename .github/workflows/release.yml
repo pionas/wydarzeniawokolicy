@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifact
-          path: build/libs/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar
+          path: build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
@@ -96,7 +96,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "wydarzeniawokolicy-0.0.1-SNAPSHOT.jar"
+          source: "wydarzeniawokolicy-${{ env.APP_VERSION }}.jar"
           target: www/wydarzeniawokolicy
       - name: run app
         uses: appleboy/ssh-action@v0.1.10
@@ -105,4 +105,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: kill -9 $(pgrep -f 'wydarzeniawokolicy') & screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar --server.port=${{ secrets.APP_PORT }}
+          script: kill -9 $(pgrep -f 'wydarzeniawokolicy') & screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar --server.port=${{ secrets.APP_PORT }}
