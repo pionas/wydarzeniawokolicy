@@ -34,7 +34,7 @@ jobs:
 
   generate-jar:
     if: ${{ github.event_name == 'push' }}
-#    needs: build-and-test
+    #    needs: build-and-test
     name: Generate Jar
     runs-on: ubuntu-latest
 
@@ -64,13 +64,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.TOKEN }}
-          fetch_all_tags: true
           script: |
             github.rest.git.createRef({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/release/WydarzeniaWOkolicy/v${{ github.event.inputs.version }}-RC${{ github.event.inputs.candidate }}",
-              sha: context.sha
+              body: '👋 Thanks for reporting!'
             })
   deploy:
     if: ${{ github.event_name == 'push' }}
