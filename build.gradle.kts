@@ -75,3 +75,11 @@ tasks.withType<Test> {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
+
+tasks.register("createGitTag") {
+    doLast {
+        exec {
+            commandLine = listOf("git", "tag", "-a", "v$version", "-m", "Version $version")
+        }
+    }
+}
