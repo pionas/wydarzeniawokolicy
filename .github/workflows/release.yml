@@ -41,8 +41,8 @@ jobs:
       - name: Read Application Config
         run: |
           cd ${{ github.workspace }} & ls -la
-          echo "APP_NAME=$(grep 'info.app.name' ${{ github.workspace }}/src/main/resources/application.yaml | awk -F: '{print $2}' | tr -d ' ')" >> $GITHUB_ENV
-          echo "APP_VERSION=$(grep 'info.app.version' ${{ github.workspace }}/src/main/resources/application.yaml | awk -F: '{print $2}' | tr -d ' ')" >> $GITHUB_ENV
+          echo "APP_NAME=$(yq read ${{ github.workspace }}/src/main/resources/application.yaml info.app.name)" >> $GITHUB_ENV
+          echo "APP_VERSION=$(yq read ${{ github.workspace }}/src/main/resources/application.yaml info.app.version)" >> $GITHUB_ENV
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
         with:
