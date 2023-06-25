@@ -40,6 +40,7 @@ jobs:
     steps:
       - name: Read Application Config
         run: |
+          ls -la
           echo "APP_NAME=$(grep 'info.app.name' ${{ github.workspace }}/src/main/resources/application.yml | awk -F: '{print $2}' | tr -d ' ')" >> $GITHUB_ENV
           echo "APP_VERSION=$(grep 'info.app.version' ${{ github.workspace }}/src/main/resources/application.yml | awk -F: '{print $2}' | tr -d ' ')" >> $GITHUB_ENV
       - name: Cancel Previous Runs
@@ -63,6 +64,18 @@ jobs:
         with:
           name: artifact
           path: build/libs/wydarzeniawokolicy-0.0.1-SNAPSHOT.jar
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              ref: "refs/tags/${{ env.APP_VERSION }}",
+            })
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
