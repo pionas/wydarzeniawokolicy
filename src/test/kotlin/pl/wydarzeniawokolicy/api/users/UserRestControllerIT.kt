@@ -17,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlConfig
 import org.springframework.web.client.HttpClientErrorException
 import pl.wydarzeniawokolicy.BasicIT
+import pl.wydarzeniawokolicy.shared.NewCategoryDto
 import java.time.LocalDateTime
 import java.util.stream.Stream
 
@@ -24,20 +25,7 @@ import java.util.stream.Stream
 internal class UserRestControllerIT : BasicIT() {
 
     @Test
-    @Disabled
-    fun shouldReturnUnauthorized() {
-        // given
-
-        // when
-        val result = restApiTemplate.getForEntity("/users", List::class.java)
-
-        // then
-        assertNotNull(result)
-        assertEquals(HttpStatus.UNAUTHORIZED, result?.statusCode)
-    }
-
-    @Test
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnUserList() {
         // given
         // when
@@ -98,7 +86,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldCreate() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -117,7 +105,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnUserDetailsById() {
         // given
         // when
@@ -147,12 +135,45 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnForbiddenWhenTryUpdateByAnonymous() {
+        // given
+        val userDetailsDto = UserDetailsDto("User", "user@example.com", "oldPassword", null, null)
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { restApiTemplate.put("/users/1", userDetailsDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnForbiddenWhenUserHasNotRole() {
+        // given
+        val userDetailsDto = UserDetailsDto("User", "user@example.com", "oldPassword", null, null)
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { forbiddenRestTemplate.put("/users/1", userDetailsDto, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnInternalServerErrorWhenTryUpdate() {
         // given
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/users/1", HashMap<String, Any>(), Any::class.java) },
+                { authorizedRestTemplate.put("/users/1", HashMap<String, Any>(), Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -161,7 +182,8 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    fun shouldReturnNotFoundWhenTryUpdateByCategoryNotExist() {
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldReturnNotFoundWhenTryUpdateButUserNotExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
         whenever(dateTimeUtils.getLocalDateTimeNow()).thenReturn(localDateTime)
@@ -171,8 +193,8 @@ internal class UserRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
-                        "/users/1",
+                    authorizedRestTemplate.exchange(
+                        "/users/100",
                         HttpMethod.PUT,
                         requestEntity,
                         UserDto::class.java
@@ -186,7 +208,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButUserByEmailExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -197,7 +219,7 @@ internal class UserRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
+                    authorizedRestTemplate.exchange(
                         "/users/1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -212,7 +234,7 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdateButUserByNameExist() {
         // given
         val localDateTime = LocalDateTime.of(2023, 5, 22, 11, 12, 0, 0)
@@ -223,7 +245,7 @@ internal class UserRestControllerIT : BasicIT() {
         val result =
             Assertions.catchThrowableOfType(
                 {
-                    restApiTemplate.exchange(
+                    authorizedRestTemplate.exchange(
                         "/users/1",
                         HttpMethod.PUT,
                         requestEntity,
@@ -239,7 +261,7 @@ internal class UserRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideUserDtoList")
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldReturnBadRequestWhenTryUpdate(
         name: String,
         email: String,
@@ -259,7 +281,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val result =
             Assertions.catchThrowableOfType(
-                { restApiTemplate.put("/users/1", userDetailsDto, Any::class.java) },
+                { authorizedRestTemplate.put("/users/1", userDetailsDto, Any::class.java) },
                 HttpClientErrorException::class.java
             )
         // then
@@ -270,7 +292,7 @@ internal class UserRestControllerIT : BasicIT() {
 
     @ParameterizedTest
     @MethodSource("provideUserDtoValidList")
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldUpdate(
         name: String,
         email: String,
@@ -291,7 +313,7 @@ internal class UserRestControllerIT : BasicIT() {
         // when
         val requestEntity = HttpEntity(userDetailsDto)
         val category: ResponseEntity<UserDto> =
-            restApiTemplate.exchange("/users/1", HttpMethod.PUT, requestEntity, UserDto::class.java)
+            authorizedRestTemplate.exchange("/users/1", HttpMethod.PUT, requestEntity, UserDto::class.java)
         // then
         assertNotNull(category)
         assertEquals(HttpStatus.OK, category.statusCode)
@@ -303,13 +325,29 @@ internal class UserRestControllerIT : BasicIT() {
     }
 
     @Test
-    @Sql(scripts = ["/db/users.sql"], config = SqlConfig(encoding = "UTF-8"))
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
     fun shouldDelete() {
         // given
         // when
-        val result = restApiTemplate.exchange("/users/1", HttpMethod.DELETE, null, Any::class.java)
+        val result = authorizedRestTemplate.exchange("/users/1", HttpMethod.DELETE, null, Any::class.java)
         // then
         assertEquals(HttpStatus.OK, result.statusCode)
+    }
+
+    @Test
+    @Sql(scripts = ["/db/users.sql", "/db/roles.sql", "/db/users_roles.sql"], config = SqlConfig(encoding = "UTF-8"))
+    fun shouldThrowForbiddenWhenTryDelete() {
+        // given
+        // when
+        val result =
+            Assertions.catchThrowableOfType(
+                { forbiddenRestTemplate.exchange("/users/1", HttpMethod.DELETE, null, Any::class.java) },
+                HttpClientErrorException::class.java
+            )
+
+        // then
+        assertNotNull(result)
+        assertEquals(HttpStatus.FORBIDDEN, result?.statusCode)
     }
 
     companion object {
