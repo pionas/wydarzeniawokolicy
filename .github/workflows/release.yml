@@ -34,7 +34,7 @@ jobs:
 
   generate-jar:
     if: ${{ github.event_name == 'push' }}
-#    needs: build-and-test
+    needs: build-and-test
     name: Generate Jar
     runs-on: ubuntu-latest
     steps:
@@ -75,6 +75,14 @@ jobs:
         with:
           name: artifact
           path: build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          files: |
+            LICENSE.txt
+            *.jar
   deploy:
     if: ${{ github.event_name == 'push' }}
     needs: generate-jar
