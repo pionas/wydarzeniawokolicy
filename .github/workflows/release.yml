@@ -110,3 +110,14 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: kill -9 $(pgrep -f 'wydarzeniawokolicy') & screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar --server.port=${{ secrets.APP_PORT }}
+
+  remove-artifact:
+    if: ${{ github.event_name == 'push' }}
+    needs: deploy
+    name: Remove local artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove local artifact
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: artifact
