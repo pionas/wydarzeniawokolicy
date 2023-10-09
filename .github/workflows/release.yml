@@ -3,9 +3,9 @@ name: "Release"
 on:
   workflow_dispatch:
   push:
-    branches: [ "master" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ main ]
 
 jobs:
   build-and-test:
@@ -27,8 +27,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-      - name: Test with Maven
-        run: mvn clean test
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Test with Gradle
+        run: ./gradlew test
 
   generate-jar:
     if: ${{ github.event_name == 'push' }}
@@ -64,14 +66,16 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
-      - name: Build PROD with Maven
-        run: mvn clean package
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build PROD with Gradle
+        run: ./gradlew clean build -x test -Pvaadin.productionMode
       - name: Upload package
         uses: actions/upload-artifact@v3
         with:
           name: artifact
           path: |
-            target/ideas-${{ env.APP_VERSION }}.jar
+            build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
             src/main/resources/application.yaml
   deploy:
     if: ${{ github.event_name == 'push' }}
@@ -91,7 +95,7 @@ jobs:
         run: |
           echo "APP_VERSION=$(yq eval '.info.app.version' ./src/main/resources/application.yaml)" >> $GITHUB_ENV
       - name: Copy jar file to project root dir
-        run: cp ./target/ideas-${{ env.APP_VERSION }}.jar ./ideas-${{ env.APP_VERSION }}.jar
+        run: cp ./build/libs/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar ./wydarzeniawokolicy-${{ env.APP_VERSION }}.jar
       - name: Deploy file via ssh password
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -99,8 +103,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "ideas-${{ env.APP_VERSION }}.jar"
-          target: www/100ideas
+          source: "wydarzeniawokolicy-${{ env.APP_VERSION }}.jar"
+          target: www/wydarzeniawokolicy
       - name: run app
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -108,7 +112,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: kill -9 $(pgrep -f '100ideas') & screen -d -m -S 100ideas java -jar ./www/100ideas/ideas-${{ env.APP_VERSION }}.jar --server.port=${{ secrets.APP_PORT }}
+          script: kill -9 $(pgrep -f 'wydarzeniawokolicy') & screen -d -m -S wydarzeniawokolicy java -jar ./www/wydarzeniawokolicy/wydarzeniawokolicy-${{ env.APP_VERSION }}.jar --server.port=${{ secrets.APP_PORT }}
 
   remove-artifact:
     if: ${{ github.event_name == 'push' }}
